@@ -57,23 +57,11 @@
   }
   @media (min-width: 1024px) { .container { padding: 0 2rem; } }
 
-  .top-strip { background: var(--color-blue-100); color: var(--color-white-00); font-size: 1rem; }
-  .top-strip__inner { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+  .top-strip { background: var(--color-blue-100); color: var(--color-white-00); font-size: 0.875rem; font-weight: 500; }
+  .top-strip__inner { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; }
 
-  .alpha-banner { background: var(--color-blue-10); border-bottom: 1px solid var(--color-blue-40); }
-  .alpha-banner__inner { padding: 1rem 0; font-size: 1.125rem; line-height: 1.5; }
-  .alpha-badge {
-    display: inline-block;
-    background: var(--color-blue-100);
-    color: var(--color-white-00);
-    font-weight: 700;
-    padding: 0.125rem 0.625rem;
-    border-radius: 2px;
-    margin-right: 0.5rem;
-    text-transform: uppercase;
-    font-size: 0.875rem;
-    letter-spacing: 0.5px;
-  }
+  .alpha-banner { background: var(--color-blue-10); }
+  .alpha-banner__inner { padding: 0.625rem 0; font-size: 1rem; line-height: 1.5; color: var(--color-black-00); }
 
   .header { background: var(--color-yellow-100); color: var(--color-black-00); }
   .header__inner { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; flex-wrap: wrap; }
@@ -86,33 +74,6 @@
   @media (max-width: 640px) {
     .header__nav ul { gap: 1rem; }
     .header__nav a { font-size: 0.9375rem; }
-  }
-
-  .demo-bar {
-    background: repeating-linear-gradient(135deg, #5b21b6 0 12px, #6d28d9 12px 24px);
-    color: var(--color-white-00);
-    border-top: 3px dashed #fbbf24;
-    border-bottom: 3px dashed #fbbf24;
-  }
-  .demo-bar__inner { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.625rem 0; font-size: 0.9375rem; }
-  .demo-bar__badge {
-    background: #fbbf24;
-    color: #1f1147;
-    font-weight: 700;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 0.125rem 0.5rem;
-    border-radius: 2px;
-  }
-  .demo-bar select {
-    font-family: inherit; font-size: 0.9375rem;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid var(--color-white-00);
-    border-radius: 2px;
-    background: var(--color-mid-grey-00);
-    color: var(--color-white-00);
-    margin-left: 0.5rem;
   }
 
   .hero { background: var(--color-yellow-100); border-bottom: 4px solid var(--color-yellow-00); }
@@ -296,11 +257,11 @@
 <div class="top-strip">
   <div class="container">
     <div class="top-strip__inner">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex-shrink:0;">
-        <path d="M12 2 L4 5 v6 c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11 V5 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M9 12 l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex-shrink:0;">
+        <path d="M12 2 L6 5 v6 c0 4.5 2.8 8.5 6 10 3.2-1.5 6-5.5 6-10 V5 Z" fill="#ffc726" stroke="#ffc726" stroke-width="1"/>
+        <path d="M12 7 v8 M9 10 l3-3 3 3" fill="none" stroke="#00267f" stroke-width="1.4" stroke-linecap="round"/>
       </svg>
-      <span>An official website of the Government of Barbados</span>
+      <span>Official government website</span>
     </div>
   </div>
 </div>
@@ -308,12 +269,7 @@
 <div class="alpha-banner">
   <div class="container">
     <div class="alpha-banner__inner" role="status" aria-label="alpha status banner" aria-live="polite">
-      <p>
-        <span class="alpha-badge">Alpha</span>
-        This is a prototype. Hours and services may be out of date — <strong>call ahead to confirm before visiting</strong>. Data sourced from the
-        <a href="https://www.health.gov.bb/Healthcare-Locator">Ministry of Health Healthcare Locator</a>.
-        <a href="#">Tell us what's wrong</a>.
-      </p>
+      <p>This page is in <a href="#">Alpha</a>.</p>
     </div>
   </div>
 </div>
@@ -358,25 +314,6 @@
   </div>
 </header>
 
-<div class="demo-bar">
-  <div class="container">
-    <div class="demo-bar__inner">
-      <span class="demo-bar__badge">Prototype only — not visible in live service</span>
-      <label>View as
-        <select id="dayPicker">
-          <option value="auto">Now (live)</option>
-          <option value="mon-10">Monday 10:00 AM</option>
-          <option value="thu-15">Thursday 3:00 PM</option>
-          <option value="sat-09">Saturday 9:00 AM</option>
-          <option value="sat-14">Saturday 2:00 PM</option>
-          <option value="sun-11">Sunday 11:00 AM</option>
-          <option value="tue-22">Tuesday 10:00 PM</option>
-        </select>
-      </label>
-      <span id="currentTimeLabel" style="opacity: 0.85;"></span>
-    </div>
-  </div>
-</div>
 
 <main>
 
@@ -1246,34 +1183,13 @@ function clearAllFilters() {
   rerender();
 }
 
-const dayPicker = document.getElementById('dayPicker');
-const timeLabel = document.getElementById('currentTimeLabel');
-function setSimulatedTime(value) {
-  if (value === 'auto') { state.simulatedTime = null; }
-  else {
-    const [day, hour] = value.split('-');
-    const dayIdx = DAY_NAMES.indexOf(day);
-    const today = new Date();
-    const diff = dayIdx - today.getDay();
-    const sim = new Date(today);
-    sim.setDate(today.getDate() + diff);
-    sim.setHours(parseInt(hour), 0, 0, 0);
-    state.simulatedTime = sim;
-  }
-  updateTimeLabel();
-  rerender();
-}
 function updateTimeLabel() {
   const d = now();
-  timeLabel.textContent = `(${DAY_LABELS[dayKey(d)]} ${fmtTime(decimalHours(d))})`;
-  // "Times shown as of" anchor — visible in production too. Tag simulated time in demo mode.
   const anchor = document.getElementById('timeAnchor');
   if (anchor) {
-    const simulated = state.simulatedTime ? ' (simulated — demo only)' : '';
-    anchor.innerHTML = `Times shown as of <strong>${DAY_LABELS[dayKey(d)]} ${fmtTime(decimalHours(d))}</strong>${simulated}.`;
+    anchor.innerHTML = `Times shown as of <strong>${DAY_LABELS[dayKey(d)]} ${fmtTime(decimalHours(d))}</strong>.`;
   }
 }
-dayPicker.onchange = (e) => setSimulatedTime(e.target.value);
 
 function rerender() {
   renderList();
