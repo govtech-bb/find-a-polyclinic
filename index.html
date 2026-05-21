@@ -155,7 +155,7 @@
     background: var(--color-white-00); color: var(--color-black-00);
     border: 0; cursor: pointer;
   }
-  .toggle__btn[aria-pressed="true"] { background: var(--color-teal-00); color: var(--color-white-00); }
+  .toggle__btn[aria-pressed="true"] { background: var(--color-teal-00); color: var(--color-white-00); font-weight: 700; box-shadow: inset 0 -3px 0 var(--color-yellow-100); }
   .results-count { font-size: 1.125rem; color: var(--color-mid-grey-00); }
 
   .content { background: var(--color-white-00); }
@@ -286,8 +286,9 @@
   .opt-list label { display: flex; align-items: center; gap: 0.75rem; font-size: 1.125rem; padding: 0.5rem 0; cursor: pointer; }
   .opt-list input { width: 1.25rem; height: 1.25rem; accent-color: var(--color-teal-00); }
 
-  [data-screen] { display: none; }
-  [data-screen].active { display: block; }
+  [data-screen] { display: none !important; }
+  [data-screen].active { display: block !important; }
+  [data-screen][hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -309,9 +310,9 @@
     <div class="alpha-banner__inner" role="status" aria-label="alpha status banner" aria-live="polite">
       <p>
         <span class="alpha-badge">Alpha</span>
-        This is a prototype service. Data sourced from the
-        <a href="https://www.health.gov.bb/Healthcare-Locator">Ministry of Health Healthcare Locator</a> —
-        <a href="#">tell us what's missing</a>.
+        This is a prototype. Hours and services may be out of date — <strong>call ahead to confirm before visiting</strong>. Data sourced from the
+        <a href="https://www.health.gov.bb/Healthcare-Locator">Ministry of Health Healthcare Locator</a>.
+        <a href="#">Tell us what's wrong</a>.
       </p>
     </div>
   </div>
@@ -384,7 +385,7 @@
       <div class="container">
         <div class="hero__inner">
           <h1>Find a polyclinic near you</h1>
-          <p>Find your nearest of Barbados' nine polyclinics, see what services they offer, and call ahead. All polyclinics open <strong>8:30 AM – 4:30 PM, Monday to Friday</strong> except <strong>Winston Scott Polyclinic</strong> which is <strong>24/7</strong>.</p>
+          <p>Find your nearest of Barbados' nine polyclinics, see what services they offer, and call ahead. Each clinic's full opening hours are on its detail page. <strong>Winston Scott Polyclinic</strong> is the only one open <strong>24/7</strong>.</p>
         </div>
       </div>
     </section>
@@ -393,9 +394,10 @@
       <div class="container">
         <div class="filter-section__inner">
           <p class="location-row" id="locationLabel">
-            <strong>Near you:</strong> Christ Church ·
-            <button id="changeLocation" type="button" class="text-link">Change parish</button>
+            Showing all polyclinics ·
+            <button id="changeLocation" type="button" class="text-link">Set your parish to sort by distance</button>
           </p>
+          <p id="timeAnchor" style="font-size: 0.9375rem; color: var(--color-mid-grey-00);"></p>
           <div>
             <p class="filter-label">Filter by:</p>
             <div class="chips" id="filterChips">
@@ -428,7 +430,7 @@
               <div id="leafletMap" style="height: 480px; max-width: 100%; border: 2px solid var(--color-blue-40); border-radius: 4px; background: var(--color-blue-10);"></div>
               <div style="display:flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
                 <button type="button" id="fitAllBtn" class="btn-secondary" style="font-size: 1rem; padding: 0.5rem 1rem;">Show all polyclinics</button>
-                <button type="button" id="locateMeBtn" class="btn-secondary" style="font-size: 1rem; padding: 0.5rem 1rem;">Find me</button>
+                <button type="button" id="locateMeBtn" class="btn-secondary" style="font-size: 1rem; padding: 0.5rem 1rem;">Use my location</button>
                 <span id="locateStatus" style="font-size: 0.9375rem; color: var(--color-mid-grey-00);"></span>
               </div>
               <div id="mapSelectedCard"></div>
@@ -451,7 +453,7 @@
     </section>
   </section>
 
-  <section data-screen="detail">
+  <section data-screen="detail" hidden aria-hidden="true">
     <section class="hero">
       <div class="container">
         <div class="hero__inner">
@@ -480,7 +482,7 @@
     </section>
   </section>
 
-  <section data-screen="location">
+  <section data-screen="location" hidden aria-hidden="true">
     <section class="hero">
       <div class="container">
         <div class="hero__inner">
@@ -513,7 +515,7 @@
           <div class="detail-actions">
             <button type="button" id="confirmParish" class="btn">Confirm parish</button>
           </div>
-          <p><button type="button" id="showAllBtn" class="text-link">Or show all polyclinics</button></p>
+          <p><button type="button" id="showAllBtn" class="text-link">Or show all polyclinics (not sorted by distance)</button></p>
         </div>
       </div>
     </section>
@@ -553,16 +555,12 @@
         </div>
       </fieldset>
       <fieldset>
-        <legend>Services</legend>
+        <legend>More services</legend>
+        <p style="font-size: 0.9375rem; color: var(--color-mid-grey-00); margin-bottom: 0.5rem;">Services not shown in the quick filters above.</p>
         <div class="opt-list">
-          <label><input type="checkbox" data-svc="Dental"              > Dental</label>
-          <label><input type="checkbox" data-svc="Pregnancy Care"       > Pregnancy Care</label>
           <label><input type="checkbox" data-svc="Immunisation"         > Immunisation</label>
-          <label><input type="checkbox" data-svc="Fast Track"           > Fast Track</label>
-          <label><input type="checkbox" data-svc="Pharmacy"             > Pharmacy</label>
           <label><input type="checkbox" data-svc="Social Services"      > Social Services</label>
           <label><input type="checkbox" data-svc="Environmental Health" > Environmental Health</label>
-          <label><input type="checkbox" data-svc="24/7"                 > Open 24/7</label>
         </div>
       </fieldset>
     </div>
@@ -732,6 +730,7 @@ let state = {
   view:'list',
   selectedClinic:null,
   currentDetailSlug:null,
+  currentParish:null,
   filters:{ openNow:false, services:new Set() },
   simulatedTime:null,
 };
@@ -1109,8 +1108,15 @@ function renderDetail(slug) {
 }
 
 function showScreen(name) {
-  document.querySelectorAll('[data-screen]').forEach(el => el.classList.remove('active'));
-  document.querySelector(`[data-screen="${name}"]`).classList.add('active');
+  document.querySelectorAll('[data-screen]').forEach(el => {
+    el.classList.remove('active');
+    el.setAttribute('aria-hidden', 'true');
+    el.setAttribute('hidden', '');
+  });
+  const target = document.querySelector(`[data-screen="${name}"]`);
+  target.classList.add('active');
+  target.setAttribute('aria-hidden', 'false');
+  target.removeAttribute('hidden');
   if (name !== 'detail') state.currentDetailSlug = null;
   window.scrollTo(0, 0);
 }
@@ -1120,15 +1126,25 @@ document.querySelectorAll('.back-to-list').forEach(el => el.addEventListener('cl
   ev.preventDefault();
   showScreen('landing');
 }));
-document.getElementById('changeLocation').onclick = () => showScreen('location');
+document.getElementById('changeLocation').onclick = () => {
+  // Pre-fill the dropdown with the currently set parish (if any) so users don't re-select.
+  if (state.currentParish) {
+    document.getElementById('parishPicker').value = state.currentParish;
+  }
+  showScreen('location');
+};
 document.getElementById('showAllBtn').onclick = () => showScreen('landing');
 
 function applyParish(value) {
   if (!value) return;
+  state.currentParish = value;
   document.getElementById('locationLabel').innerHTML =
     `<strong>Near you:</strong> ${value} ·
      <button id="changeLocation" type="button" class="text-link">Change parish</button>`;
-  document.getElementById('changeLocation').onclick = () => showScreen('location');
+  document.getElementById('changeLocation').onclick = () => {
+    document.getElementById('parishPicker').value = state.currentParish || '';
+    showScreen('location');
+  };
   showScreen('landing');
 }
 document.getElementById('confirmParish').onclick = () => {
@@ -1250,6 +1266,12 @@ function setSimulatedTime(value) {
 function updateTimeLabel() {
   const d = now();
   timeLabel.textContent = `(${DAY_LABELS[dayKey(d)]} ${fmtTime(decimalHours(d))})`;
+  // "Times shown as of" anchor — visible in production too. Tag simulated time in demo mode.
+  const anchor = document.getElementById('timeAnchor');
+  if (anchor) {
+    const simulated = state.simulatedTime ? ' (simulated — demo only)' : '';
+    anchor.innerHTML = `Times shown as of <strong>${DAY_LABELS[dayKey(d)]} ${fmtTime(decimalHours(d))}</strong>${simulated}.`;
+  }
 }
 dayPicker.onchange = (e) => setSimulatedTime(e.target.value);
 
