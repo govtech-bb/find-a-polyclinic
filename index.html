@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find a Polyclinic — Government of Barbados</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+  :root {
+    --color-yellow-100: #ffc726;
+    --color-yellow-40:  #ffe9a8;
+    --color-yellow-00:  #e8a833;
+    --color-blue-100:   #00267f;
+    --color-blue-40:    #99a8cc;
+    --color-blue-10:    #e5e9f2;
+    --color-teal-100:   #30c0c8;
+    --color-teal-40:    #ace6e9;
+    --color-teal-10:    #eaf9f9;
+    --color-teal-00:    #0e5f64;
+    --color-green-00:   #00654a;
+    --color-green-40:   #a5e5ce;
+    --color-green-10:   #e9f9f3;
+    --color-red-00:     #a42c2c;
+    --color-red-10:     #fff0f0;
+    --color-grey-00:    #e0e4e9;
+    --color-mid-grey-00:#595959;
+    --color-black-00:   #000;
+    --color-white-00:   #fff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { background: var(--color-blue-100); }
+  body {
+    font-family: 'Figtree', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    color: var(--color-black-00);
+    background: var(--color-white-00);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, p, ul, ol, fieldset, legend { margin: 0; padding: 0; }
+  ul { list-style: none; }
+  button { font-family: inherit; }
+  a { color: var(--color-teal-00); text-decoration: underline; text-underline-offset: 2px; }
+  a:hover { background: var(--color-teal-10); color: #083a3d; text-decoration: none; }
+  a:focus-visible { background: var(--color-yellow-100); color: var(--color-black-00); outline: 4px solid var(--color-yellow-100); outline-offset: 0; text-decoration: none; }
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  @media (min-width: 1024px) { .container { padding: 0 2rem; } }
+
+  .top-strip { background: var(--color-blue-100); color: var(--color-white-00); font-size: 1rem; }
+  .top-strip__inner { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+
+  .alpha-banner { background: var(--color-blue-10); border-bottom: 1px solid var(--color-blue-40); }
+  .alpha-banner__inner { padding: 1rem 0; font-size: 1.125rem; line-height: 1.5; }
+  .alpha-badge {
+    display: inline-block;
+    background: var(--color-blue-100);
+    color: var(--color-white-00);
+    font-weight: 700;
+    padding: 0.125rem 0.625rem;
+    border-radius: 2px;
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+
+  .header { background: var(--color-yellow-100); color: var(--color-black-00); }
+  .header__inner { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; flex-wrap: wrap; }
+  .header__logo { display: inline-flex; align-items: center; }
+  .header__logo svg { height: 1.875rem; width: auto; color: var(--color-black-00); display: block; }
+  .header__nav { margin-left: auto; }
+  .header__nav ul { display: flex; gap: 1.5rem; align-items: center; }
+  .header__nav a { color: var(--color-black-00); font-weight: 500; text-decoration: none; }
+  .header__nav a:hover { text-decoration: underline; background: transparent; color: var(--color-black-00); }
+  @media (max-width: 640px) {
+    .header__nav ul { gap: 1rem; }
+    .header__nav a { font-size: 0.9375rem; }
+  }
+
+  .demo-bar {
+    background: repeating-linear-gradient(135deg, #5b21b6 0 12px, #6d28d9 12px 24px);
+    color: var(--color-white-00);
+    border-top: 3px dashed #fbbf24;
+    border-bottom: 3px dashed #fbbf24;
+  }
+  .demo-bar__inner { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.625rem 0; font-size: 0.9375rem; }
+  .demo-bar__badge {
+    background: #fbbf24;
+    color: #1f1147;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.125rem 0.5rem;
+    border-radius: 2px;
+  }
+  .demo-bar select {
+    font-family: inherit; font-size: 0.9375rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-white-00);
+    border-radius: 2px;
+    background: var(--color-mid-grey-00);
+    color: var(--color-white-00);
+    margin-left: 0.5rem;
+  }
+
+  .hero { background: var(--color-yellow-100); border-bottom: 4px solid var(--color-yellow-00); }
+  .hero__inner { padding: 2.5rem 0; display: flex; flex-direction: column; gap: 1rem; }
+  .hero h1 { font-size: 3.5rem; line-height: 1.15; font-weight: 700; }
+  .hero p { font-size: 1.25rem; line-height: 1.5; max-width: 50rem; }
+  .hero__back { font-size: 1rem; }
+  .hero__back a { color: var(--color-black-00); }
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 2rem; line-height: 1.2; }
+    .hero p { font-size: 1.125rem; }
+  }
+
+  .filter-section { background: var(--color-teal-10); border-bottom: 4px solid var(--color-teal-40); }
+  .filter-section__inner { padding: 2rem 0; display: flex; flex-direction: column; gap: 1.25rem; }
+  .location-row { font-size: 1.125rem; }
+  .filter-label { font-weight: 700; margin-bottom: 0.5rem; font-size: 1.125rem; }
+
+  .chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  /* Active pills move to the front; "More filters…" pill stays last. */
+  .chips .chip[aria-pressed="true"] { order: -1; }
+  .chips #moreFilters { order: 1; }
+  .chip { transition: background-color .15s, color .15s, order 0s; }
+  .chip {
+    font-family: inherit; font-size: 1rem; line-height: 1.4;
+    background: var(--color-white-00); color: var(--color-black-00);
+    border: 2px solid var(--color-black-00);
+    border-radius: 999px; padding: 0.375rem 1rem; cursor: pointer;
+    transition: background-color .15s, color .15s;
+  }
+  .chip:hover { background: var(--color-grey-00); }
+  .chip[aria-pressed="true"] { background: var(--color-teal-00); color: var(--color-white-00); border-color: var(--color-teal-00); }
+  .chip:focus-visible { outline: 4px solid var(--color-yellow-100); outline-offset: 2px; }
+
+  .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .toggle { display: inline-flex; border: 2px solid var(--color-black-00); border-radius: 4px; overflow: hidden; }
+  .toggle__btn {
+    font-family: inherit; font-size: 1rem;
+    padding: 0.5rem 1.25rem;
+    background: var(--color-white-00); color: var(--color-black-00);
+    border: 0; cursor: pointer;
+  }
+  .toggle__btn[aria-pressed="true"] { background: var(--color-teal-00); color: var(--color-white-00); }
+  .results-count { font-size: 1.125rem; color: var(--color-mid-grey-00); }
+
+  .content { background: var(--color-white-00); }
+  .content__inner { padding: 2rem 0; }
+
+  .item { display: flex; flex-direction: column; gap: 0.5rem; border-top: 2px solid var(--color-grey-00); padding: 1.5rem 0; }
+  .item:first-child { border-top: 0; padding-top: 0.5rem; }
+  .item__head { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  .item__title {
+    font-size: 1.5rem; line-height: 1.25; font-weight: 700;
+    color: var(--color-teal-00);
+    text-decoration: underline; text-underline-offset: 2px;
+    background: transparent; border: 0; padding: 0; cursor: pointer;
+    text-align: left; font-family: inherit;
+  }
+  .item__title:hover { background: var(--color-teal-10); color: #083a3d; text-decoration: none; }
+  .item__title:focus-visible { outline: 4px solid var(--color-yellow-100); outline-offset: 2px; background: var(--color-yellow-100); color: var(--color-black-00); }
+  .item__meta { color: var(--color-mid-grey-00); font-size: 1.125rem; }
+  .item__services { font-size: 1.125rem; }
+  .item__actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem; }
+
+  .status { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1rem; line-height: 1.4; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 4px; white-space: nowrap; }
+  .status__dot { width: 0.625rem; height: 0.625rem; border-radius: 50%; flex-shrink: 0; }
+  .status--open   { background: var(--color-green-10); color: var(--color-green-00); }
+  .status--open   .status__dot { background: var(--color-green-00); }
+  .status--closed { background: var(--color-red-10);   color: var(--color-red-00); }
+  .status--closed .status__dot { background: var(--color-red-00); }
+  .status--always { background: var(--color-blue-10);  color: var(--color-blue-100); }
+  .status--always .status__dot { background: var(--color-blue-100); }
+
+  .btn, .btn-secondary, .btn-tertiary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    font-family: inherit; font-size: 1.125rem; font-weight: 400; line-height: 1.5;
+    padding: 0.625rem 1.25rem; border-radius: 4px; border: 0;
+    cursor: pointer; text-decoration: none;
+    transition: background-color .2s, box-shadow .2s;
+  }
+  .btn { background: var(--color-teal-00); color: var(--color-white-00); }
+  .btn:hover { background: #1a777d; box-shadow: inset 0 0 0 4px rgba(222,245,246,0.10); color: var(--color-white-00); text-decoration: none; }
+  .btn:focus-visible { outline: 4px solid var(--color-teal-100); outline-offset: 2px; background: #0a4549; }
+  .btn-secondary { background: var(--color-grey-00); color: var(--color-black-00); }
+  .btn-secondary:hover { box-shadow: inset 0 0 0 4px rgba(0,0,0,0.05); }
+  .btn-tertiary { background: transparent; color: var(--color-green-00); box-shadow: inset 0 0 0 1px var(--color-green-00); }
+  .btn-tertiary:hover { background: var(--color-green-10); }
+
+  .feedback {
+    border: 4px solid var(--color-yellow-100);
+    background: var(--color-yellow-40);
+    padding: 1.5rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .feedback h3 { font-size: 1.5rem; line-height: 1.25; font-weight: 700; }
+  .feedback p { font-size: 1.125rem; }
+  .feedback a:not(.btn):not(.btn-secondary):not(.btn-tertiary) { color: var(--color-teal-00); font-size: 1.125rem; }
+
+  .footer { background: var(--color-blue-100); color: var(--color-white-00); }
+  .footer__inner { padding: 2rem 0; display: flex; flex-direction: column; gap: 1rem; }
+  .footer ul { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .footer a { color: var(--color-white-00); }
+  .footer a:hover { background: var(--color-teal-10); color: var(--color-black-00); }
+  .footer p { font-size: 1rem; opacity: 0.9; }
+
+  .detail-section { display: flex; flex-direction: column; gap: 1rem; }
+  .detail-section h2 { font-size: 2rem; line-height: 1.25; font-weight: 700; }
+  @media (max-width: 640px) { .detail-section h2 { font-size: 1.5rem; } }
+  .detail-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  .hours { display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 1.5rem; font-size: 1.125rem; }
+  .hours__row { display: contents; }
+  .hours__day, .hours__time { padding: 0.625rem 0; border-bottom: 1px solid var(--color-grey-00); }
+  .hours__row--today .hours__day, .hours__row--today .hours__time { font-weight: 700; }
+  .hours__row--closed .hours__time { color: var(--color-mid-grey-00); }
+  .hours__star { color: var(--color-yellow-00); font-weight: bold; }
+
+  .phones { border-top: 2px solid var(--color-grey-00); }
+  .phones__row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 0; border-bottom: 2px solid var(--color-grey-00);
+    text-decoration: none; font-size: 1.125rem; color: var(--color-black-00);
+  }
+  .phones__row:hover { background: var(--color-teal-10); }
+  .phones__num { color: var(--color-teal-00); text-decoration: underline; font-weight: 700; }
+
+  .bullets { list-style: disc inside; font-size: 1.125rem; line-height: 1.8; }
+
+  .notice { padding: 1rem 1.25rem; border-left: 4px solid; display: flex; flex-direction: column; gap: 0.25rem; }
+  .notice--info { background: var(--color-blue-10); border-color: var(--color-blue-100); }
+  .notice--warn { background: var(--color-red-10); border-color: var(--color-red-00); }
+  .notice--teal { background: var(--color-teal-10); border-color: var(--color-teal-00); }
+  .notice strong { font-weight: 700; font-size: 1.125rem; }
+  .notice p { font-size: 1.125rem; }
+
+  .map { position: relative; background: var(--color-blue-10); border: 2px solid var(--color-blue-40); border-radius: 4px; aspect-ratio: 4 / 5; overflow: hidden; max-width: 500px; }
+  .map__pin { position: absolute; transform: translate(-50%, -50%); cursor: pointer; background: none; border: 0; padding: 0; }
+  .map__pin-dot { width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 3px solid var(--color-white-00); box-shadow: 0 1px 4px rgba(0,0,0,0.25); transition: transform .15s; }
+  .map__pin:hover .map__pin-dot, .map__pin[aria-pressed="true"] .map__pin-dot { transform: scale(1.3); }
+  .map__pin--open .map__pin-dot { background: var(--color-green-00); }
+  .map__pin--closed .map__pin-dot { background: var(--color-red-00); }
+  .map__you { position: absolute; display: flex; align-items: center; gap: 0.375rem; transform: translate(-50%, -50%); }
+  .map__you-dot { width: 1rem; height: 1rem; border-radius: 50%; background: var(--color-blue-100); border: 3px solid var(--color-white-00); box-shadow: 0 0 0 4px rgba(0,38,127,0.25); }
+  .map__you-label { font-size: 0.875rem; font-weight: 700; color: var(--color-blue-100); background: var(--color-white-00); padding: 0 0.5rem; border-radius: 2px; }
+
+  .field { display: flex; flex-direction: column; gap: 0.5rem; max-width: 26rem; }
+  .field label { font-weight: 700; font-size: 1.125rem; }
+  .field select { font-family: inherit; font-size: 1.125rem; padding: 0.75rem 1rem; border: 2px solid var(--color-black-00); border-radius: 4px; background: var(--color-white-00); }
+  .field select:focus { outline: 4px solid var(--color-teal-100); outline-offset: 2px; }
+
+  .text-link {
+    background: none; border: 0; padding: 0;
+    color: var(--color-teal-00);
+    text-decoration: underline; text-underline-offset: 2px;
+    cursor: pointer; font-family: inherit; font-size: inherit;
+  }
+  .text-link:hover { background: var(--color-teal-10); color: #083a3d; text-decoration: none; }
+
+  .modal { position: fixed; inset: 0; z-index: 50; display: none; }
+  .modal[aria-hidden="false"] { display: block; }
+  .modal__scrim { position: absolute; inset: 0; background: rgba(0,38,127,0.6); }
+  .modal__panel { position: absolute; left: 0; right: 0; bottom: 0; background: var(--color-white-00); max-height: 90vh; overflow-y: auto; border-top: 4px solid var(--color-yellow-100); }
+  .modal__header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 2px solid var(--color-grey-00); position: sticky; top: 0; background: var(--color-white-00); }
+  .modal__header h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.25; }
+  .modal__footer { display: flex; gap: 1rem; padding: 1rem 1.5rem; border-top: 2px solid var(--color-grey-00); position: sticky; bottom: 0; background: var(--color-white-00); }
+  .modal__footer > * { flex: 1; }
+  .modal__body { padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+  .modal__body fieldset { border: 0; padding: 0; }
+  .modal__body legend { font-weight: 700; font-size: 1.25rem; margin-bottom: 0.5rem; }
+  .opt-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .opt-list label { display: flex; align-items: center; gap: 0.75rem; font-size: 1.125rem; padding: 0.5rem 0; cursor: pointer; }
+  .opt-list input { width: 1.25rem; height: 1.25rem; accent-color: var(--color-teal-00); }
+
+  [data-screen] { display: none; }
+  [data-screen].active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="top-strip">
+  <div class="container">
+    <div class="top-strip__inner">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex-shrink:0;">
+        <path d="M12 2 L4 5 v6 c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11 V5 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M9 12 l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>An official website of the Government of Barbados</span>
+    </div>
+  </div>
+</div>
+
+<div class="alpha-banner">
+  <div class="container">
+    <div class="alpha-banner__inner" role="status" aria-label="alpha status banner" aria-live="polite">
+      <p>
+        <span class="alpha-badge">Alpha</span>
+        This is a prototype service. Data sourced from the
+        <a href="https://www.health.gov.bb/Healthcare-Locator">Ministry of Health Healthcare Locator</a> —
+        <a href="#">tell us what's missing</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<header class="header">
+  <div class="container">
+    <div class="header__inner">
+      <a href="#" class="header__logo back-to-list" aria-label="Find a Polyclinic homepage">
+        <svg viewBox="0 0 276 27" fill="currentColor" role="img" aria-label="Government of Barbados">
+          <path d="M39.079 21.527C37.5026 21.527 36.103 21.1903 34.8802 20.5168C33.6721 19.8286 32.7219 18.8916 32.0294 17.7057C31.337 16.5051 30.9908 15.1288 30.9908 13.5769C30.9908 12.0249 31.337 10.6559 32.0294 9.47001C32.7219 8.26943 33.6721 7.3324 34.8802 6.65891C36.103 5.97077 37.5026 5.6267 39.079 5.6267C40.0219 5.6267 40.8911 5.7658 41.6867 6.04398C42.4823 6.32216 43.1821 6.71015 43.7861 7.20795C44.4049 7.69111 44.9205 8.24747 45.3331 8.87704L42.858 10.4144C42.6075 10.0191 42.276 9.66767 41.8635 9.3602C41.4657 9.05274 41.0237 8.81116 40.5376 8.63547C40.0514 8.45977 39.5652 8.37192 39.079 8.37192C38.1067 8.37192 37.2448 8.59886 36.4934 9.05274C35.7421 9.49197 35.1527 10.0996 34.7255 10.8756C34.2982 11.6515 34.0846 12.552 34.0846 13.5769C34.0846 14.5871 34.2909 15.4875 34.7034 16.2782C35.1307 17.0688 35.7273 17.691 36.4934 18.1449C37.2595 18.5841 38.1435 18.8038 39.1453 18.8038C39.8967 18.8038 40.567 18.6647 41.1563 18.3865C41.7456 18.0937 42.2171 17.691 42.5707 17.1786C42.9243 16.6661 43.1231 16.0659 43.1673 15.3777H39.5873V13.0278H46.0844V14.8946C46.055 16.3001 45.7382 17.5007 45.1342 18.4963C44.5301 19.4773 43.7051 20.2313 42.6591 20.7584C41.613 21.2708 40.4197 21.527 39.079 21.527Z"/>
+          <path d="M52.8353 21.527C51.7156 21.527 50.7138 21.2854 49.8298 20.8023C48.9606 20.3045 48.2755 19.6237 47.7746 18.7598C47.2884 17.896 47.0453 16.9004 47.0453 15.773C47.0453 14.6457 47.2884 13.6501 47.7746 12.7862C48.2608 11.9224 48.9385 11.2489 49.8077 10.7658C50.677 10.268 51.6714 10.0191 52.7911 10.0191C53.9255 10.0191 54.9273 10.268 55.7966 10.7658C56.6658 11.2489 57.3435 11.9224 57.8297 12.7862C58.3159 13.6501 58.559 14.6457 58.559 15.773C58.559 16.9004 58.3159 17.896 57.8297 18.7598C57.3435 19.6237 56.6658 20.3045 55.7966 20.8023C54.9421 21.2854 53.955 21.527 52.8353 21.527ZM52.8353 18.8477C53.3804 18.8477 53.8592 18.7159 54.2717 18.4524C54.6843 18.1888 55.001 17.8301 55.222 17.3763C55.4577 16.9077 55.5756 16.3733 55.5756 15.773C55.5756 15.1728 55.4577 14.6457 55.222 14.1918C54.9863 13.7233 54.6548 13.3572 54.2275 13.0937C53.815 12.8302 53.3362 12.6984 52.7911 12.6984C52.2607 12.6984 51.7819 12.8302 51.3547 13.0937C50.9421 13.3572 50.618 13.7233 50.3823 14.1918C50.1466 14.6457 50.0287 15.1728 50.0287 15.773C50.0287 16.3733 50.1466 16.9077 50.3823 17.3763C50.618 17.8301 50.9495 18.1888 51.3768 18.4524C51.804 18.7159 52.2902 18.8477 52.8353 18.8477Z"/>
+          <path d="M62.8109 21.2635L58.2806 10.2826H61.2861L64.2694 17.9472L67.2528 10.2826H70.2583L65.728 21.2635H62.8109Z"/>
+          <path d="M75.7678 21.527C74.6776 21.527 73.7126 21.2854 72.8729 20.8023C72.0331 20.3045 71.3701 19.6237 70.884 18.7598C70.4125 17.896 70.1768 16.9004 70.1768 15.773C70.1768 14.6457 70.4199 13.6501 70.906 12.7862C71.407 11.9224 72.0847 11.2489 72.9392 10.7658C73.8084 10.268 74.8029 10.0191 75.9225 10.0191C76.8949 10.0191 77.7862 10.2753 78.5965 10.7877C79.4216 11.2855 80.0772 12.0249 80.5633 13.0059C81.0643 13.9722 81.3147 15.1508 81.3147 16.5417H73.2265C73.3001 17.2738 73.6169 17.8594 74.1767 18.2986C74.7366 18.7232 75.3701 18.9355 76.0772 18.9355C76.6813 18.9355 77.1748 18.8111 77.5579 18.5622C77.9409 18.2986 78.2356 17.9619 78.4418 17.5519L81.0495 18.5622C80.7401 19.1771 80.335 19.7115 79.8341 20.1654C79.3479 20.6046 78.766 20.9414 78.0883 21.1756C77.4106 21.4099 76.6371 21.527 75.7678 21.527ZM73.3811 14.3894H78.1545C78.1103 13.9356 77.963 13.5695 77.7126 13.2914C77.4621 13.0132 77.1675 12.8082 76.8286 12.6764C76.4898 12.5447 76.1583 12.4788 75.8341 12.4788C75.5247 12.4788 75.1859 12.5447 74.8176 12.6764C74.464 12.7936 74.1472 12.9912 73.8673 13.2694C73.6021 13.5476 73.4401 13.9209 73.3811 14.3894Z"/>
+          <path d="M82.4937 21.2635V10.2826H85.4107V12.3031C85.8675 11.6149 86.442 11.1025 87.1345 10.7658C87.8416 10.4144 88.5709 10.2387 89.3223 10.2387V13.0498C88.6446 13.0498 88.0037 13.1303 87.3997 13.2914C86.8103 13.4524 86.3315 13.716 85.9632 14.082C85.5949 14.448 85.4107 14.9165 85.4107 15.4875V21.2635H82.4937Z"/>
+          <path d="M90.8937 21.2635V10.2826H93.634L93.7666 11.776C94.1202 11.205 94.5695 10.7731 95.1146 10.4803C95.6744 10.1728 96.308 10.0191 97.0151 10.0191C97.8844 10.0191 98.6284 10.1947 99.2471 10.5461C99.8659 10.8975 100.337 11.4466 100.661 12.1933C100.986 12.9253 101.14 13.877 101.126 15.0483V21.2635H98.2085V15.6413C98.2085 14.8946 98.1201 14.3162 97.9433 13.9063C97.7812 13.4963 97.5455 13.2035 97.2361 13.0278C96.9267 12.8375 96.5658 12.7423 96.1533 12.7423C95.4019 12.7277 94.82 12.9546 94.4074 13.4231C94.0097 13.8916 93.8108 14.5871 93.8108 15.5095V21.2635H90.8937Z"/>
+          <path d="M103.196 21.2635V10.2826H105.936L106.069 11.7101C106.407 11.1538 106.842 10.7365 107.372 10.4583C107.903 10.1655 108.492 10.0191 109.14 10.0191C110.039 10.0191 110.79 10.2094 111.395 10.5901C112.013 10.9707 112.463 11.5564 112.743 12.347C113.067 11.6003 113.523 11.0293 114.113 10.634C114.702 10.224 115.387 10.0191 116.168 10.0191C117.464 10.0191 118.451 10.429 119.129 11.2489C119.807 12.0542 120.146 13.2987 120.146 14.9824V21.2635H117.229V15.6413C117.229 14.8946 117.148 14.3162 116.986 13.9063C116.824 13.4963 116.603 13.2035 116.323 13.0278C116.043 12.8375 115.711 12.7423 115.328 12.7423C114.621 12.7277 114.076 12.9546 113.693 13.4231C113.31 13.8916 113.118 14.5871 113.118 15.5095V21.2635H110.201V15.6413C110.201 14.8946 110.12 14.3162 109.958 13.9063C109.811 13.4963 109.59 13.2035 109.295 13.0278C109.015 12.8375 108.684 12.7423 108.301 12.7423C107.593 12.7277 107.048 12.9546 106.665 13.4231C106.297 13.8916 106.113 14.5871 106.113 15.5095V21.2635H103.196Z"/>
+          <path d="M126.946 21.527C125.856 21.527 124.891 21.2854 124.051 20.8023C123.211 20.3045 122.548 19.6237 122.062 18.7598C121.59 17.896 121.355 16.9004 121.355 15.773C121.355 14.6457 121.598 13.6501 122.084 12.7862C122.585 11.9224 123.263 11.2489 124.117 10.7658C124.986 10.268 125.981 10.0191 127.1 10.0191C128.073 10.0191 128.964 10.2753 129.774 10.7877C130.6 11.2855 131.255 12.0249 131.741 13.0059C132.242 13.9722 132.493 15.1508 132.493 16.5417H124.404C124.478 17.2738 124.795 17.8594 125.355 18.2986C125.915 18.7232 126.548 18.9355 127.255 18.9355C127.859 18.9355 128.353 18.8111 128.736 18.5622C129.119 18.2986 129.414 17.9619 129.62 17.5519L132.227 18.5622C131.918 19.1771 131.513 19.7115 131.012 20.1654C130.526 20.6046 129.944 20.9414 129.266 21.1756C128.588 21.4099 127.815 21.527 126.946 21.527ZM124.559 14.3894H129.332C129.288 13.9356 129.141 13.5695 128.891 13.2914C128.64 13.0132 128.345 12.8082 128.007 12.6764C127.668 12.5447 127.336 12.4788 127.012 12.4788C126.703 12.4788 126.364 12.5447 125.996 12.6764C125.642 12.7936 125.325 12.9912 125.045 13.2694C124.78 13.5476 124.618 13.9209 124.559 14.3894Z"/>
+          <path d="M133.93 21.2635V10.2826H136.67L136.803 11.776C137.156 11.205 137.606 10.7731 138.151 10.4803C138.711 10.1728 139.344 10.0191 140.051 10.0191C140.92 10.0191 141.664 10.1947 142.283 10.5461C142.902 10.8975 143.373 11.4466 143.698 12.1933C144.022 12.9253 144.176 13.877 144.162 15.0483V21.2635H141.245V15.6413C141.245 14.8946 141.156 14.3162 140.979 13.9063C140.817 13.4963 140.582 13.2035 140.272 13.0278C139.963 12.8375 139.602 12.7423 139.189 12.7423C138.438 12.7277 137.856 12.9546 137.444 13.4231C137.046 13.8916 136.847 14.5871 136.847 15.5095V21.2635H133.93Z"/>
+          <path d="M150.526 21.527C149.303 21.527 148.375 21.2269 147.742 20.6266C147.123 20.0263 146.813 19.1698 146.813 18.0571V12.7423H145.023V10.2826H146.813V6.85656H149.731V10.2826H152.493V12.7423H149.731V17.4202C149.731 17.8887 149.834 18.2474 150.04 18.4963C150.246 18.7306 150.548 18.8477 150.946 18.8477C151.093 18.8477 151.255 18.8184 151.432 18.7598C151.609 18.6866 151.793 18.5841 151.985 18.4524L153.001 20.6266C152.648 20.8901 152.25 21.1024 151.808 21.2635C151.381 21.4392 150.953 21.527 150.526 21.527Z"/>
+          <path d="M186.422 21.2635V5.89025H191.66C192.72 5.89025 193.649 6.0513 194.444 6.37341C195.24 6.69551 195.859 7.18599 196.3 7.84485C196.742 8.48906 196.963 9.29432 196.963 10.2606C196.963 10.8609 196.809 11.4173 196.499 11.9297C196.205 12.4275 195.785 12.8594 195.24 13.2255C195.962 13.5915 196.514 14.082 196.897 14.6969C197.295 15.2972 197.494 16.0509 197.494 16.8711C197.494 17.7935 197.28 18.6061 196.853 19.265C196.426 19.9238 195.829 20.4216 195.063 20.7584C194.297 21.0951 193.398 21.2635 192.367 21.2635H186.422ZM189.383 18.6061H192.08C192.801 18.6061 193.369 18.4304 193.781 18.079C194.194 17.713 194.4 17.2298 194.4 16.6296C194.4 16 194.172 15.5095 193.715 15.1581C193.258 14.7921 192.632 14.6091 191.836 14.6091H189.383V18.6061ZM189.383 12.1494H191.726C192.389 12.1494 192.912 11.981 193.295 11.6442C193.678 11.3075 193.87 10.8316 193.87 10.2167C193.87 9.60179 193.656 9.12595 193.229 8.7892C192.801 8.45245 192.22 8.28408 191.483 8.28408H189.383V12.1494Z"/>
+          <path d="M202.673 21.527C201.347 21.527 200.316 21.2342 199.58 20.6486C198.858 20.0629 198.497 19.2357 198.497 18.1669C198.497 16.9956 198.887 16.1171 199.668 15.5315C200.464 14.9312 201.576 14.631 203.005 14.631H205.613C205.509 13.9575 205.296 13.4451 204.972 13.0937C204.648 12.7277 204.184 12.5447 203.58 12.5447C203.108 12.5447 202.681 12.6472 202.298 12.8521C201.915 13.0571 201.591 13.3719 201.325 13.7965L198.762 12.918C198.968 12.4495 199.27 11.9956 199.668 11.5564C200.066 11.1025 200.581 10.7365 201.215 10.4583C201.863 10.1655 202.651 10.0191 203.58 10.0191C204.699 10.0191 205.627 10.2314 206.364 10.656C207.115 11.0805 207.668 11.6808 208.021 12.4568C208.39 13.2182 208.566 14.1259 208.552 15.1801L208.485 21.2635H205.767L205.723 19.9897C205.443 20.4875 205.045 20.8682 204.53 21.1317C204.029 21.3953 203.41 21.527 202.673 21.527ZM203.16 19.1112C203.631 19.1112 204.058 19.0014 204.441 18.7818C204.824 18.5622 205.126 18.2767 205.347 17.9253C205.568 17.5739 205.679 17.2079 205.679 16.8272V16.7833H204.021C203.064 16.7833 202.401 16.9004 202.033 17.1347C201.664 17.3543 201.48 17.6691 201.48 18.079C201.48 18.4011 201.627 18.6574 201.922 18.8477C202.217 19.0234 202.629 19.1112 203.16 19.1112Z"/>
+          <path d="M210.512 21.2635V10.2826H213.429V12.3031C213.886 11.6149 214.461 11.1025 215.153 10.7658C215.86 10.4144 216.59 10.2387 217.341 10.2387V13.0498C216.663 13.0498 216.022 13.1303 215.418 13.2914C214.829 13.4524 214.35 13.716 213.982 14.082C213.614 14.448 213.429 14.9165 213.429 15.4875V21.2635H210.512Z"/>
+          <path d="M224.7 21.527C223.948 21.527 223.293 21.3733 222.733 21.0658C222.173 20.7437 221.702 20.2898 221.318 19.7042L221.208 21.2635H218.446V5.89025H221.363V11.776C221.731 11.205 222.195 10.7731 222.755 10.4803C223.315 10.1728 223.963 10.0191 224.7 10.0191C225.716 10.0191 226.593 10.2533 227.329 10.7218C228.081 11.1904 228.663 11.8565 229.075 12.7204C229.488 13.5695 229.694 14.5871 229.694 15.773C229.694 16.9443 229.488 17.9619 229.075 18.8257C228.663 19.6896 228.081 20.3557 227.329 20.8242C226.593 21.2928 225.716 21.527 224.7 21.527ZM223.948 18.8697C224.479 18.8697 224.943 18.7379 225.34 18.4743C225.753 18.2108 226.077 17.8448 226.313 17.3763C226.549 16.9077 226.666 16.3733 226.666 15.773C226.666 15.1728 226.549 14.6384 226.313 14.1698C226.092 13.7013 225.775 13.3426 225.363 13.0937C224.965 12.8302 224.501 12.6984 223.97 12.6984C223.469 12.6984 223.02 12.8302 222.622 13.0937C222.225 13.3572 221.915 13.7233 221.694 14.1918C221.473 14.6457 221.363 15.1728 221.363 15.773C221.363 16.3733 221.473 16.9077 221.694 17.3763C221.915 17.8448 222.217 18.2108 222.6 18.4743C222.998 18.7379 223.447 18.8697 223.948 18.8697Z"/>
+          <path d="M234.674 21.527C233.348 21.527 232.317 21.2342 231.58 20.6486C230.858 20.0629 230.497 19.2357 230.497 18.1669C230.497 16.9956 230.887 16.1171 231.668 15.5315C232.464 14.9312 233.576 14.631 235.005 14.631H237.613C237.51 13.9575 237.296 13.4451 236.972 13.0937C236.648 12.7277 236.184 12.5447 235.58 12.5447C235.108 12.5447 234.681 12.6472 234.298 12.8521C233.915 13.0571 233.591 13.3719 233.326 13.7965L230.762 12.918C230.969 12.4495 231.271 11.9956 231.668 11.5564C232.066 11.1025 232.582 10.7365 233.215 10.4583C233.863 10.1655 234.652 10.0191 235.58 10.0191C236.7 10.0191 237.628 10.2314 238.364 10.656C239.116 11.0805 239.668 11.6808 240.022 12.4568C240.39 13.2182 240.567 14.1259 240.552 15.1801L240.486 21.2635H237.768L237.723 19.9897C237.443 20.4875 237.046 20.8682 236.53 21.1317C236.029 21.3953 235.41 21.527 234.674 21.527ZM235.16 19.1112C235.631 19.1112 236.059 19.0014 236.442 18.7818C236.825 18.5622 237.127 18.2767 237.348 17.9253C237.569 17.5739 237.679 17.2079 237.679 16.8272V16.7833H236.022C235.064 16.7833 234.401 16.9004 234.033 17.1347C233.665 17.3543 233.48 17.6691 233.48 18.079C233.48 18.4011 233.628 18.6574 233.922 18.8477C234.217 19.0234 234.63 19.1112 235.16 19.1112Z"/>
+          <path d="M246.758 21.527C245.742 21.527 244.858 21.2928 244.107 20.8242C243.37 20.3557 242.795 19.6896 242.383 18.8257C241.97 17.9619 241.764 16.9443 241.764 15.773C241.764 14.5871 241.97 13.5695 242.383 12.7204C242.795 11.8565 243.37 11.1904 244.107 10.7218C244.858 10.2533 245.742 10.0191 246.758 10.0191C247.48 10.0191 248.121 10.1728 248.681 10.4803C249.256 10.7731 249.72 11.1977 250.073 11.754V5.89025H252.99V21.2635H250.228L250.14 19.7262C249.771 20.2972 249.3 20.7437 248.725 21.0658C248.151 21.3733 247.495 21.527 246.758 21.527ZM247.51 18.8697C247.996 18.8697 248.423 18.7525 248.792 18.5183C249.175 18.2694 249.477 17.9253 249.698 17.4861C249.919 17.0468 250.044 16.549 250.073 15.9927V15.5534C250.044 14.9971 249.919 14.5066 249.698 14.082C249.477 13.6428 249.175 13.306 248.792 13.0717C248.409 12.8228 247.974 12.6984 247.488 12.6984C246.957 12.6984 246.486 12.8302 246.073 13.0937C245.676 13.3426 245.359 13.7013 245.123 14.1698C244.902 14.6384 244.792 15.1728 244.792 15.773C244.792 16.3733 244.909 16.9077 245.145 17.3763C245.381 17.8448 245.698 18.2108 246.095 18.4743C246.508 18.7379 246.979 18.8697 247.51 18.8697Z"/>
+          <path d="M260.409 21.527C259.289 21.527 258.287 21.2854 257.403 20.8023C256.534 20.3045 255.849 19.6237 255.348 18.7598C254.862 17.896 254.619 16.9004 254.619 15.773C254.619 14.6457 254.862 13.6501 255.348 12.7862C255.834 11.9224 256.512 11.2489 257.381 10.7658C258.25 10.268 259.245 10.0191 260.364 10.0191C261.499 10.0191 262.501 10.268 263.37 10.7658C264.239 11.2489 264.917 11.9224 265.403 12.7862C265.889 13.6501 266.132 14.6457 266.132 15.773C266.132 16.9004 265.889 17.896 265.403 18.7598C264.917 19.6237 264.239 20.3045 263.37 20.8023C262.515 21.2854 261.528 21.527 260.409 21.527ZM260.409 18.8477C260.954 18.8477 261.433 18.7159 261.845 18.4524C262.258 18.1888 262.574 17.8301 262.795 17.3763C263.031 16.9077 263.149 16.3733 263.149 15.773C263.149 15.1728 263.031 14.6457 262.795 14.1918C262.56 13.7233 262.228 13.3572 261.801 13.0937C261.388 12.8302 260.91 12.6984 260.364 12.6984C259.834 12.6984 259.355 12.8302 258.928 13.0937C258.515 13.3572 258.191 13.7233 257.956 14.1918C257.72 14.6457 257.602 15.1728 257.602 15.773C257.602 16.3733 257.72 16.9077 257.956 17.3763C258.191 17.8301 258.523 18.1888 258.95 18.4524C259.377 18.7159 259.863 18.8477 260.409 18.8477Z"/>
+          <path d="M271.536 21.527C270.829 21.527 270.166 21.4245 269.547 21.2196C268.928 20.9999 268.383 20.6925 267.912 20.2972C267.44 19.8872 267.072 19.3894 266.807 18.8038L269.304 17.6618C269.525 18.0131 269.827 18.3206 270.21 18.5841C270.593 18.833 271.035 18.9575 271.536 18.9575C272.022 18.9575 272.398 18.8916 272.663 18.7598C272.928 18.6134 273.061 18.4085 273.061 18.1449C273.061 17.8814 272.95 17.691 272.729 17.5739C272.523 17.4421 272.236 17.3323 271.867 17.2445L270.851 16.9809C269.79 16.7028 268.95 16.2635 268.332 15.6632C267.728 15.0483 267.426 14.3455 267.426 13.5549C267.426 12.4275 267.787 11.5564 268.508 10.9415C269.245 10.3265 270.284 10.0191 271.624 10.0191C272.317 10.0191 272.958 10.1215 273.547 10.3265C274.151 10.5315 274.667 10.817 275.094 11.183C275.521 11.5491 275.816 11.9737 275.978 12.4568L273.569 13.5549C273.466 13.2621 273.216 13.0278 272.818 12.8521C272.42 12.6618 272.022 12.5666 271.624 12.5666C271.227 12.5666 270.917 12.6545 270.696 12.8302C270.49 12.9912 270.387 13.2182 270.387 13.511C270.387 13.7013 270.49 13.8624 270.696 13.9941C270.902 14.1113 271.197 14.2138 271.58 14.3016L273.017 14.653C273.739 14.8287 274.313 15.1142 274.74 15.5095C275.182 15.8902 275.499 16.3221 275.691 16.8052C275.897 17.2738 276 17.735 276 18.1888C276 18.8477 275.801 19.4333 275.403 19.9458C275.02 20.4436 274.49 20.8316 273.812 21.1098C273.149 21.3879 272.39 21.527 271.536 21.527Z"/>
+          <path d="M165.302 21.527C164.182 21.527 163.18 21.2855 162.296 20.8023C161.427 20.3045 160.742 19.6237 160.241 18.7598C159.755 17.896 159.512 16.9004 159.512 15.773C159.512 14.6457 159.755 13.6501 160.241 12.7862C160.727 11.9224 161.405 11.2489 162.274 10.7658C163.144 10.268 164.138 10.0191 165.258 10.0191C166.392 10.0191 167.394 10.268 168.263 10.7658C169.132 11.2489 169.81 11.9224 170.296 12.7862C170.782 13.6501 171.026 14.6457 171.026 15.773C171.026 16.9004 170.782 17.896 170.296 18.7598C169.81 19.6237 169.132 20.3045 168.263 20.8023C167.409 21.2855 166.422 21.527 165.302 21.527ZM165.302 18.8477C165.847 18.8477 166.326 18.7159 166.738 18.4524C167.151 18.1888 167.468 17.8301 167.689 17.3763C167.924 16.9077 168.042 16.3733 168.042 15.773C168.042 15.1728 167.924 14.6457 167.689 14.1918C167.453 13.7233 167.121 13.3572 166.694 13.0937C166.282 12.8302 165.803 12.6984 165.258 12.6984C164.727 12.6984 164.249 12.8302 163.821 13.0937C163.409 13.3572 163.085 13.7233 162.849 14.1918C162.613 14.6457 162.495 15.1728 162.495 15.773C162.495 16.3733 162.613 16.9077 162.849 17.3763C163.085 17.8301 163.416 18.1888 163.843 18.4524C164.271 18.7159 164.757 18.8477 165.302 18.8477Z"/>
+          <path d="M173.144 21.2635V12.6105H171.309V10.2826H173.144V9.18451C173.144 8.01321 173.446 7.10546 174.05 6.46125C174.654 5.8024 175.574 5.47297 176.812 5.47297C177.239 5.47297 177.689 5.54618 178.16 5.69259C178.646 5.839 179.088 6.0147 179.486 6.21967L178.403 8.30604C178.167 8.18891 177.954 8.10106 177.762 8.04249C177.571 7.98393 177.394 7.95465 177.232 7.95465C176.834 7.95465 176.539 8.09374 176.348 8.37192C176.156 8.63547 176.061 9.06738 176.061 9.66767V10.2826H178.403V8.30604H173.144Z"/>
+          <path d="M12.5786 0C11.6253 2.46943 10.6536 5.03986 8.57466 7.00774C9.21998 6.80573 10.3493 6.62461 11.0753 6.64203V17.0283L7.988 17.4636C7.878 17.4532 7.84133 17.2895 7.84133 17.0666C7.54434 13.8413 6.74135 11.1316 5.81736 8.32779C5.75136 7.94466 4.58171 6.48181 5.4837 6.73955C5.5937 6.75348 6.80002 7.2202 6.60935 6.99729C4.96671 5.38119 2.56508 4.21788 0.233112 3.87306C0.0277812 3.8243 -0.0932171 3.92183 0.0901136 4.14822C3.18474 8.6726 5.77336 14.012 5.75136 20.3475C6.95401 20.3475 9.86897 19.6718 11.0753 19.6718V27H12.5969L12.9453 6.53406L12.5786 0Z"/>
+          <path d="M12.5786 0C13.5319 2.46943 14.5036 5.03986 16.5825 7.00774C15.9372 6.80573 14.8079 6.62461 14.0819 6.64203V17.0283L17.1692 17.4636C17.2792 17.4532 17.3159 17.2895 17.3159 17.0666C17.6129 13.8413 18.4158 11.1316 19.3398 8.32779C19.4058 7.94466 20.5755 6.48181 19.6735 6.73955C19.5635 6.75348 18.3572 7.2202 18.5478 6.99729C20.1905 5.38119 22.5921 4.21788 24.9241 3.87306C25.1294 3.8243 25.2504 3.92183 25.0671 4.14822C21.9725 8.6726 19.3838 14.012 19.4058 20.3475C18.2032 20.3475 15.2882 19.6718 15.2882 19.6718V27H12.5603L12.2119 6.53406L12.5786 0Z"/>
+        </svg>
+      </a>
+      <nav class="header__nav" aria-label="Primary">
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">Organisations</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="demo-bar">
+  <div class="container">
+    <div class="demo-bar__inner">
+      <span class="demo-bar__badge">Prototype only — not visible in live service</span>
+      <label>View as
+        <select id="dayPicker">
+          <option value="auto">Now (live)</option>
+          <option value="mon-10">Monday 10:00 AM</option>
+          <option value="thu-15">Thursday 3:00 PM</option>
+          <option value="sat-09">Saturday 9:00 AM</option>
+          <option value="sat-14">Saturday 2:00 PM</option>
+          <option value="sun-11">Sunday 11:00 AM</option>
+          <option value="tue-22">Tuesday 10:00 PM</option>
+        </select>
+      </label>
+      <span id="currentTimeLabel" style="opacity: 0.85;"></span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <section data-screen="landing" class="active">
+    <section class="hero">
+      <div class="container">
+        <div class="hero__inner">
+          <h1>Find a polyclinic near you</h1>
+          <p>Find your nearest of Barbados' nine polyclinics, see what services they offer, and call ahead. All polyclinics open <strong>8:30 AM – 4:30 PM, Monday to Friday</strong> except <strong>Winston Scott Polyclinic</strong> which is <strong>24/7</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="filter-section">
+      <div class="container">
+        <div class="filter-section__inner">
+          <p class="location-row" id="locationLabel">
+            <strong>Near you:</strong> Christ Church ·
+            <button id="changeLocation" type="button" class="text-link">Change parish</button>
+          </p>
+          <div>
+            <p class="filter-label">Filter by:</p>
+            <div class="chips" id="filterChips">
+              <button type="button" class="chip" data-pill="openNow"                 aria-pressed="false">Open now</button>
+              <button type="button" class="chip" data-pill="svc" data-svc="24/7"           aria-pressed="false">Open 24/7</button>
+              <button type="button" class="chip" data-pill="svc" data-svc="Fast Track"     aria-pressed="false">Fast Track</button>
+              <button type="button" class="chip" data-pill="svc" data-svc="Dental"         aria-pressed="false">Dental</button>
+              <button type="button" class="chip" data-pill="svc" data-svc="Pregnancy Care" aria-pressed="false">Pregnancy Care</button>
+              <button type="button" class="chip" data-pill="svc" data-svc="Pharmacy"       aria-pressed="false">Pharmacy</button>
+              <button type="button" class="chip" id="moreFilters">More filters…</button>
+            </div>
+          </div>
+          <div class="toolbar">
+            <p class="results-count" id="resultsCount"></p>
+            <div class="toggle" role="tablist" aria-label="Result view">
+              <button type="button" class="toggle__btn" id="toggleList" role="tab" aria-pressed="true">List</button>
+              <button type="button" class="toggle__btn" id="toggleMap"  role="tab" aria-pressed="false">Map</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="container">
+        <div class="content__inner">
+          <div id="listView"></div>
+          <div id="mapView" style="display:none;">
+            <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+              <div id="leafletMap" style="height: 480px; max-width: 100%; border: 2px solid var(--color-blue-40); border-radius: 4px; background: var(--color-blue-10);"></div>
+              <div style="display:flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                <button type="button" id="fitAllBtn" class="btn-secondary" style="font-size: 1rem; padding: 0.5rem 1rem;">Show all polyclinics</button>
+                <button type="button" id="locateMeBtn" class="btn-secondary" style="font-size: 1rem; padding: 0.5rem 1rem;">Find me</button>
+                <span id="locateStatus" style="font-size: 0.9375rem; color: var(--color-mid-grey-00);"></span>
+              </div>
+              <div id="mapSelectedCard"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="container">
+        <div style="padding: 1rem 0 3rem;">
+          <div class="feedback">
+            <h3>Help us improve this service</h3>
+            <p>Was this page helpful? Did you find what you needed?</p>
+            <p><a href="#">Send feedback →</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section data-screen="detail">
+    <section class="hero">
+      <div class="container">
+        <div class="hero__inner">
+          <p class="hero__back"><a href="#" class="back-to-list">← Back to all polyclinics</a></p>
+          <h1 id="detailName"></h1>
+          <p id="detailMeta"></p>
+          <div id="detailStatus"></div>
+        </div>
+      </div>
+    </section>
+    <section class="content">
+      <div class="container">
+        <div class="content__inner" id="detailBody" style="display:flex; flex-direction:column; gap:2.5rem;"></div>
+      </div>
+    </section>
+    <section class="content">
+      <div class="container">
+        <div style="padding: 1rem 0 3rem;">
+          <div class="feedback">
+            <h3>Help us improve this service</h3>
+            <p>Was the information on this page helpful?</p>
+            <p><a href="#">Send feedback →</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section data-screen="location">
+    <section class="hero">
+      <div class="container">
+        <div class="hero__inner">
+          <p class="hero__back"><a href="#" class="back-to-list">← Back to all polyclinics</a></p>
+          <h1>Where are you?</h1>
+          <p>Pick your parish so we can sort polyclinics by distance.</p>
+        </div>
+      </div>
+    </section>
+    <section class="content">
+      <div class="container">
+        <div class="content__inner" style="display:flex; flex-direction:column; gap:1.5rem;">
+          <div class="field">
+            <label for="parishPicker">Parish</label>
+            <select id="parishPicker">
+              <option value="">Choose a parish…</option>
+              <option>Christ Church</option>
+              <option>St. Michael</option>
+              <option>St. George</option>
+              <option>St. Philip</option>
+              <option>St. James</option>
+              <option>St. Thomas</option>
+              <option>St. John</option>
+              <option>St. Joseph</option>
+              <option>St. Andrew</option>
+              <option>St. Peter</option>
+              <option>St. Lucy</option>
+            </select>
+          </div>
+          <div class="detail-actions">
+            <button type="button" id="confirmParish" class="btn">Confirm parish</button>
+          </div>
+          <p><button type="button" id="showAllBtn" class="text-link">Or show all polyclinics</button></p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <nav aria-label="Footer">
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms &amp; conditions</a></li>
+          <li><a href="#">Contact the Ministry of Health</a></li>
+        </ul>
+      </nav>
+      <p>© 2026 Government of Barbados. Maintained by the Ministry of Health and Wellness.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="filterDrawer" class="modal" aria-hidden="true" role="dialog" aria-labelledby="filterTitle">
+  <div class="modal__scrim" id="filterScrim"></div>
+  <div class="modal__panel">
+    <div class="modal__header">
+      <h2 id="filterTitle">Filters</h2>
+      <button id="closeFilters" type="button" class="text-link" aria-label="Close filters">Close ✕</button>
+    </div>
+    <div class="modal__body">
+      <fieldset>
+        <legend>Availability</legend>
+        <div class="opt-list">
+          <label><input type="checkbox" id="availOpenNow"> Open now</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Services</legend>
+        <div class="opt-list">
+          <label><input type="checkbox" data-svc="Dental"              > Dental</label>
+          <label><input type="checkbox" data-svc="Pregnancy Care"       > Pregnancy Care</label>
+          <label><input type="checkbox" data-svc="Immunisation"         > Immunisation</label>
+          <label><input type="checkbox" data-svc="Fast Track"           > Fast Track</label>
+          <label><input type="checkbox" data-svc="Pharmacy"             > Pharmacy</label>
+          <label><input type="checkbox" data-svc="Social Services"      > Social Services</label>
+          <label><input type="checkbox" data-svc="Environmental Health" > Environmental Health</label>
+          <label><input type="checkbox" data-svc="24/7"                 > Open 24/7</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="modal__footer">
+      <button type="button" id="clearFilters" class="btn-secondary">Clear</button>
+      <button type="button" id="applyFilters" class="btn">Show <span id="applyCount">9</span> clinics</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Real polyclinic data from health.gov.bb/Healthcare-Locator (all 9 polyclinics).
+// All polyclinics: 8:30 AM – 4:30 PM, Mon–Fri — except Winston Scott which is 24/7.
+// Phone numbers are direct lines (each is a full local number, not an extension).
+const CLINICS = [
+  { slug:'randal-phillips',  name:'Randal Phillips Polyclinic',  parish:'Christ Church', address:'Oistins Main Road, Christ Church',
+    distance:0.5, lat:13.0645, lng:-59.5350, mapX:50, mapY:88,
+    phones:{ main:'+1-246-536-4300', exts:[
+      ['Medical Officer of Health', '+1-246-536-4303'],
+      ['Senior Health Sister (morning)', '+1-246-536-4304'],
+      ['Principal Environmental Health Officer', '+1-246-536-4306'],
+      ['Senior Clerk', '+1-246-536-4308'],
+      ['Environmental Health', '+1-246-536-4314'],
+      ['Pharmacy', '+1-246-536-4346'],
+      ['Medical Records', '+1-246-536-4338'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Pharmacy','Environmental Health'],
+    is247:false, lastVerified:'2026-05-12', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=7' },
+
+  { slug:'edgar-cochrane',   name:'Edgar Cochrane Polyclinic',   parish:'St. Michael', address:'Wildey, St. Michael',
+    distance:4.1, lat:13.0926825, lng:-59.5862874, mapX:45, mapY:78,
+    phones:{ main:'+1-246-536-4100', exts:[
+      ['General Practice Clinic', '+1-246-536-4118'],
+      ['Medical Officer of Health', '+1-246-536-4110'],
+      ['Senior Health Sister', '+1-246-536-4111'],
+      ['Senior Clerk', '+1-246-536-4112'],
+      ['Records', '+1-246-536-4115'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care'],
+    is247:false, lastVerified:'2026-05-12', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=3' },
+
+  { slug:'winston-scott',    name:'Winston Scott Polyclinic',    parish:'St. Michael', address:'Ladymeade Gardens, Bridgetown, St. Michael',
+    distance:5.2, lat:13.0919744, lng:-59.6072704, mapX:38, mapY:70,
+    phones:{ main:'+1-246-536-3400', exts:[
+      ['Medical Officer of Health', '+1-246-536-3409'],
+      ['Senior Health Sister', '+1-246-536-3403'],
+      ['Fast Track Doctor', '+1-246-536-3416'],
+      ['Fast Track Nurse', '+1-246-536-3440'],
+      ['Lady Meade Reference Unit', '+1-246-536-3315'],
+      ['Vashti Inniss Empowerment Centre', '+1-246-536-3300'],
+      ['Principal Environmental Officer', '+1-246-536-3484'],
+      ['Senior Environmental Health Officer', '+1-246-536-6483'],
+    ]},
+    hours:{ mon:[0,24], tue:[0,24], wed:[0,24], thu:[0,24], fri:[0,24], sat:[0,24], sun:[0,24] },
+    extendedDays:[],
+    services:['General Practice','Fast Track','Immunisation','Pregnancy Care','24/7'],
+    is247:true, lastVerified:'2026-05-15', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=9' },
+
+  { slug:'branford-taitt',   name:'Branford Taitt Polyclinic',   parish:'St. Michael', address:'Black Rock Main Road, St. Michael',
+    distance:7.8, lat:13.1180833, lng:-59.6181658, mapX:25, mapY:62,
+    phones:{ main:'+1-246-536-3700', exts:[
+      ['Medical Officer of Health', '+1-246-536-3703'],
+      ['Senior Health Sister', '+1-246-536-3704'],
+      ['Principal Environmental Health Officer', '+1-246-536-3705'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Environmental Health'],
+    is247:false, lastVerified:'2026-05-15', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=1' },
+
+  { slug:'eunice-gibson',    name:'Eunice Gibson Polyclinic',    parish:'St. Michael', address:'Warrens, St. Michael',
+    distance:9.2, lat:13.1410169, lng:-59.6060684, mapX:38, mapY:48,
+    phones:{ main:'+1-246-536-4000', exts:[
+      ['Medical Officer of Health', '+1-246-536-4007'],
+      ['Senior Health Sister', '+1-246-536-4014'],
+      ['Senior Clerk', '+1-246-536-4028'],
+      ['Environmental Health', '+1-246-536-4033'],
+      ['Records Section', '+1-246-536-4004'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Environmental Health'],
+    is247:false, lastVerified:'2026-04-08', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=4' },
+
+  { slug:'frederick-miller', name:'Frederick "Freddie" Miller Polyclinic', parish:'St. George', address:'The Glebe, St. George',
+    distance:10.5, lat:13.1350746, lng:-59.5634572, mapX:55, mapY:62,
+    phones:{ main:'+1-246-536-3940', exts:[
+      ['Medical Officer of Health', '+1-246-536-3947'],
+      ['Senior Health Sister', '+1-246-536-3950'],
+      ['Senior Clerk', '+1-246-536-3961'],
+      ['Pharmacy', '+1-246-536-3966'],
+      ['Records Department', '+1-246-536-3945'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Pharmacy'],
+    is247:false, lastVerified:'2026-05-18', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=5' },
+
+  { slug:'st-philip',        name:'St. Philip Polyclinic',       parish:'St. Philip', address:'Six Roads Cross Roads, St. Philip',
+    distance:11.6, lat:13.1180875, lng:-59.4762681, mapX:78, mapY:75,
+    phones:{ main:null, exts:[
+      ['Medical Officer of Health', '+1-246-536-4229'],
+      ['Senior Health Sister', '+1-246-536-4230'],
+      ['Senior Clerk', '+1-246-536-4232'],
+      ['Pharmacy', '+1-246-536-4214'],
+      ['Records Department', '+1-246-536-4212'],
+      ['Environmental Health', '+1-246-536-1240'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Pharmacy','Environmental Health'],
+    is247:false, lastVerified:'2026-04-29', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=8' },
+
+  { slug:'david-thompson',   name:'David Thompson Health & Social Services Complex', parish:'St. John', address:'Colleton Road, Glebe Land, St. John',
+    distance:17.5, lat:13.1818838, lng:-59.4961274, mapX:75, mapY:50,
+    phones:{ main:'+1-246-536-4400', exts:[
+      ['Medical Officer of Health', '+1-246-536-4443'],
+      ['Senior Health Sister', '+1-246-536-4444'],
+      ['Senior Environmental Health Officer', '+1-246-536-4445'],
+      ['Environmental Front Desk', '+1-246-536-4453'],
+      ['Senior Clerk', '+1-246-536-4446'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Social Services','Environmental Health'],
+    is247:false, lastVerified:'2026-05-12', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=2' },
+
+  { slug:'maurice-byer',     name:'Maurice Byer Polyclinic',     parish:'St. Peter', address:'Station Hill, St. Peter',
+    distance:30.0, lat:13.2535440, lng:-59.6385191, mapX:30, mapY:18,
+    phones:{ main:'+1-246-536-3200', exts:[
+      ['Medical Officer of Health', '+1-246-536-3203'],
+      ['Senior Health Sister', '+1-246-536-3205'],
+      ['Senior Health Sister (Extended Hours line)', '+1-246-536-3231'],
+      ['General Practice Nurses', '+1-246-536-3226'],
+      ['Public Health Nurses', '+1-246-536-3237'],
+      ['Dental Unit', '+1-246-536-3243'],
+      ['Medical Records', '+1-246-536-3239'],
+      ['Pharmacy / Senior Clerk', '+1-246-536-3206'],
+      ['Environmental Health Office', '+1-246-536-3214'],
+    ]},
+    hours:{ mon:[8.5,16.5], tue:[8.5,16.5], wed:[8.5,16.5], thu:[8.5,16.5], fri:[8.5,16.5], sat:null, sun:null },
+    extendedDays:[],
+    services:['General Practice','Immunisation','Pregnancy Care','Dental','Environmental Health','Pharmacy'],
+    is247:false, lastVerified:'2026-05-08', banner:null,
+    source:'https://www.health.gov.bb/Institution?institution=6' },
+];
+
+const QEH = { name:'Queen Elizabeth Hospital — A&E', address:'Martindales Road, Bridgetown', phone:'+1-246-436-6450', distance:4.2 };
+
+const DAY_NAMES = ['sun','mon','tue','wed','thu','fri','sat'];
+const DAY_LABELS = { mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday', fri:'Friday', sat:'Saturday', sun:'Sunday' };
+
+// Unified filter state — pills and modal both read/write here.
+let state = {
+  view:'list',
+  selectedClinic:null,
+  currentDetailSlug:null,
+  filters:{ openNow:false, services:new Set() },
+  simulatedTime:null,
+};
+
+// Pills the user can toggle directly from the chip bar. Services in this set are
+// NOT counted in the "More filters (N)" badge.
+const PILL_SERVICES = new Set(['24/7','Fast Track','Dental','Pregnancy Care','Pharmacy']);
+
+// Service-name → human label shown on chips and in the empty-state filter list.
+const SERVICE_LABELS = {
+  '24/7': 'Open 24/7',
+  'Fast Track': 'Fast Track',
+  'Dental': 'Dental',
+  'Pregnancy Care': 'Pregnancy Care',
+  'Pharmacy': 'Pharmacy',
+  'Immunisation': 'Immunisation',
+  'Social Services': 'Social Services',
+  'Environmental Health': 'Environmental Health',
+};
+
+function now() { return state.simulatedTime || new Date(); }
+function dayKey(d) { return DAY_NAMES[d.getDay()]; }
+function decimalHours(d) { return d.getHours() + d.getMinutes()/60; }
+function fmtTime(h) {
+  const hr = Math.floor(h), min = Math.round((h-hr)*60);
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  const h12 = ((hr+11)%12)+1;
+  return `${h12}:${String(min).padStart(2,'0')} ${ampm}`;
+}
+
+function getStatus(c) {
+  const d = now(), today = dayKey(d), h = c.hours[today], cur = decimalHours(d);
+  if (c.is247) return { open:true, label:'Open 24 hours', cls:'always' };
+  if (h && cur >= h[0] && cur < h[1]) return { open:true, label:`Open until ${fmtTime(h[1])}`, cls:'open' };
+  for (let i = 1; i <= 7; i++) {
+    const next = new Date(d); next.setDate(d.getDate()+i); next.setHours(0,0,0,0);
+    const nh = c.hours[dayKey(next)];
+    if (nh) {
+      const dayLabel = i === 1 ? 'tomorrow' : DAY_LABELS[dayKey(next)];
+      return { open:false, label:`Closed · Opens ${dayLabel} at ${fmtTime(nh[0])}`, cls:'closed' };
+    }
+  }
+  return { open:false, label:'Closed', cls:'closed' };
+}
+
+function isOpenOn(c, d) { return !!c.hours[d]; }
+
+function getVisibleClinics() {
+  let list = CLINICS.slice();
+  if (state.filters.openNow) list = list.filter(c => getStatus(c).open);
+  for (const svc of state.filters.services) {
+    if (svc === '24/7') list = list.filter(c => c.is247);
+    else list = list.filter(c => c.services.includes(svc));
+  }
+  return list.sort((a,b) => a.distance - b.distance);
+}
+
+function statusHTML(s) {
+  return `<span class="status status--${s.cls}"><span class="status__dot" aria-hidden="true"></span><span>${s.label}</span></span>`;
+}
+
+function fmtPhone(p) { return p ? p.replace('+1-', '') : ''; }
+function primaryPhone(c) {
+  // Use main switchboard if listed; otherwise fall back to the first direct line (usually MoH).
+  return c.phones.main || (c.phones.exts[0] && c.phones.exts[0][1]) || null;
+}
+function itemHTML(c) {
+  const s = getStatus(c);
+  const phone = primaryPhone(c);
+  const phoneLabel = fmtPhone(phone);
+  return `
+    <article class="item">
+      <div class="item__head">
+        <button class="item__title" data-link="${c.slug}">${c.name}</button>
+        ${statusHTML(s)}
+      </div>
+      <p class="item__meta">${c.parish} · ${c.distance} km · ${c.address}</p>
+      <div class="item__actions">
+        <button type="button" class="btn-secondary btn-directions" data-slug="${c.slug}">Get directions</button>
+        ${phone ? `<a href="tel:${phone}" class="btn">Call ${phoneLabel}</a>` : `<button type="button" class="btn-secondary" data-link="${c.slug}">See departments</button>`}
+      </div>
+    </article>`;
+}
+
+function renderList() {
+  const list = getVisibleClinics();
+  const container = document.getElementById('listView');
+  document.getElementById('resultsCount').textContent = `${list.length} polyclinic${list.length === 1 ? '' : 's'}`;
+
+  if (list.length === 0) {
+    const activeChips = [];
+    if (state.filters.openNow) activeChips.push({key:'__openNow', label:'Open now'});
+    for (const svc of state.filters.services) activeChips.push({key:svc, label:(SERVICE_LABELS[svc] || svc)});
+    const chipsHTML = activeChips.length
+      ? `<p style="margin-bottom: 0.5rem;"><strong>Active filters:</strong></p>
+         <div class="chips" style="margin-bottom: 0.75rem;">${activeChips.map(c => `
+           <button type="button" class="chip" aria-pressed="true" data-remove="${c.key}" title="Remove ${c.label}">${c.label} ✕</button>
+         `).join('')}</div>`
+      : '';
+    container.innerHTML = `
+      <div class="feedback">
+        <h3>No polyclinics match these filters</h3>
+        <p>Try removing a filter, or check back at a different time.</p>
+        ${chipsHTML}
+        <p><button id="clearAllFiltersBtn" type="button" class="text-link">Clear all filters</button></p>
+      </div>`;
+    document.getElementById('clearAllFiltersBtn').onclick = clearAllFilters;
+    container.querySelectorAll('[data-remove]').forEach(el => {
+      el.addEventListener('click', () => {
+        const key = el.dataset.remove;
+        if (key === '__openNow') state.filters.openNow = false;
+        else state.filters.services.delete(key);
+        syncFilterUI();
+        rerender();
+      });
+    });
+    return;
+  }
+
+  // Show the "most closed" banner only when the majority of polyclinics are closed
+  // (i.e., outside regular hours — Winston Scott alone is open).
+  const openCount = list.filter(c => getStatus(c).open).length;
+  const closedCount = list.length - openCount;
+  const mostClosed = list.length > 0 && closedCount > openCount;
+  let prefix = '';
+  if (mostClosed) {
+    prefix = `
+      <div class="feedback" style="margin-bottom: 1.5rem;">
+        <h3>Most polyclinics are closed right now</h3>
+        <p>For emergencies, the hospital A&E is open 24 hours.</p>
+        <article class="item" style="border-top:0; padding-top:0;">
+          <div class="item__head">
+            <span class="item__title" style="text-decoration:none; cursor:default;">${QEH.name}</span>
+            ${statusHTML({cls:'always', label:'Open 24 hours'})}
+          </div>
+          <p class="item__meta">${QEH.distance} km · ${QEH.address}</p>
+          <div class="item__actions">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(QEH.address)}" target="_blank" rel="noopener" class="btn-secondary">Get directions</a>
+            <a href="tel:${QEH.phone}" class="btn">Call ${QEH.phone.replace('+1-','')}</a>
+          </div>
+        </article>
+      </div>`;
+  }
+
+  container.innerHTML = prefix + list.map(c => itemHTML(c)).join('');
+
+  container.querySelectorAll('[data-link]').forEach(el => el.addEventListener('click', () => showDetail(el.dataset.link)));
+  container.querySelectorAll('.btn-directions').forEach(el => {
+    el.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const c = CLINICS.find(c => c.slug === el.dataset.slug);
+      window.open(directionsURL(c), '_blank', 'noopener');
+    });
+  });
+}
+
+// Google Maps deep link for directions — no API key required.
+function directionsURL(c) {
+  if (c.lat && c.lng) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}&destination_place_id=${encodeURIComponent(c.name)}`;
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`;
+}
+function placeURL(c) {
+  if (c.lat && c.lng) {
+    return `https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.address)}`;
+}
+
+// Leaflet map instance + marker layer (created lazily on first map view).
+let _map = null;
+let _markers = {};   // slug -> L.Marker
+let _userMarker = null;
+
+function ensureMap() {
+  if (_map) return _map;
+  _map = L.map('leafletMap', { scrollWheelZoom: false }).setView([13.165, -59.55], 11);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(_map);
+  return _map;
+}
+
+function markerIcon(open) {
+  const colour = open ? '#00654a' : '#a42c2c';
+  const html = `<span style="display:block; width:1.25rem; height:1.25rem; border-radius:50%; background:${colour}; border:3px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,0.4);"></span>`;
+  return L.divIcon({ html, className: '', iconSize: [20,20], iconAnchor: [10,10] });
+}
+
+function renderMap() {
+  const map = ensureMap();
+  // Leaflet sometimes mis-sizes when the container starts hidden. Recompute after layout.
+  setTimeout(() => map.invalidateSize(), 50);
+
+  const list = getVisibleClinics();
+  const visibleSlugs = new Set(list.map(c => c.slug));
+
+  // Add or update markers for visible clinics; remove markers that are no longer visible.
+  for (const c of list) {
+    const s = getStatus(c);
+    if (_markers[c.slug]) {
+      _markers[c.slug].setIcon(markerIcon(s.open));
+    } else {
+      const marker = L.marker([c.lat, c.lng], { icon: markerIcon(s.open), title: c.name }).addTo(map);
+      marker.on('click', () => { state.selectedClinic = c.slug; renderMap(); });
+      _markers[c.slug] = marker;
+    }
+  }
+  for (const slug of Object.keys(_markers)) {
+    if (!visibleSlugs.has(slug)) {
+      map.removeLayer(_markers[slug]);
+      delete _markers[slug];
+    }
+  }
+
+  // Selected clinic card
+  const sel = state.selectedClinic && visibleSlugs.has(state.selectedClinic)
+    ? CLINICS.find(c => c.slug === state.selectedClinic) : null;
+  const host = document.getElementById('mapSelectedCard');
+  if (sel) {
+    host.innerHTML = itemHTML(sel);
+    host.querySelector('[data-link]').addEventListener('click', () => showDetail(sel.slug));
+    const dirBtn = host.querySelector('.btn-directions');
+    if (dirBtn) dirBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.open(directionsURL(sel), '_blank', 'noopener');
+    });
+    // Pan map to selected.
+    map.flyTo([sel.lat, sel.lng], 14, { duration: 0.6 });
+  } else {
+    host.innerHTML = `<p style="color: var(--color-mid-grey-00); padding: 1rem 0;">Tap a pin to see clinic details.</p>`;
+  }
+}
+
+function fitAllPolyclinics() {
+  const map = ensureMap();
+  const list = getVisibleClinics();
+  if (list.length === 0) return;
+  const bounds = L.latLngBounds(list.map(c => [c.lat, c.lng]));
+  if (_userMarker) bounds.extend(_userMarker.getLatLng());
+  map.fitBounds(bounds, { padding: [30, 30] });
+}
+
+function locateUser() {
+  const map = ensureMap();
+  const status = document.getElementById('locateStatus');
+  if (!navigator.geolocation) {
+    status.textContent = 'Geolocation not available in this browser.';
+    return;
+  }
+  status.textContent = 'Locating…';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      if (_userMarker) map.removeLayer(_userMarker);
+      const youIcon = L.divIcon({
+        html: '<span style="display:block; width:1rem; height:1rem; border-radius:50%; background:#00267f; border:3px solid #fff; box-shadow:0 0 0 4px rgba(0,38,127,0.25);"></span>',
+        className: '', iconSize: [16,16], iconAnchor: [8,8]
+      });
+      _userMarker = L.marker([latitude, longitude], { icon: youIcon, title: 'You are here' }).addTo(map);
+      map.flyTo([latitude, longitude], 13);
+      status.textContent = 'Showing your location.';
+    },
+    (err) => {
+      status.textContent = err.code === err.PERMISSION_DENIED
+        ? 'Location permission denied. Use “Change parish” to set your area.'
+        : 'Could not get your location.';
+    },
+    { timeout: 10000, maximumAge: 60000 }
+  );
+}
+
+function renderDetail(slug) {
+  const c = CLINICS.find(x => x.slug === slug);
+  if (!c) return;
+  document.getElementById('detailName').textContent = c.name;
+  document.getElementById('detailMeta').textContent = `${c.parish} · ${c.address}`;
+  const s = getStatus(c);
+  document.getElementById('detailStatus').innerHTML = statusHTML(s);
+
+  const verifiedDate = new Date(c.lastVerified);
+  const daysSince = Math.floor((now() - verifiedDate) / (1000*60*60*24));
+  const stale = daysSince > 30;
+  const todayKey = dayKey(now());
+
+  const hoursRows = ['mon','tue','wed','thu','fri','sat','sun'].map(d => {
+    const h = c.hours[d];
+    const today = d === todayKey;
+    const ext = c.extendedDays.includes(d) ? ' <span class="hours__star" aria-label="extended hours">★</span>' : '';
+    const time = h ? `${fmtTime(h[0])} – ${fmtTime(h[1])}${ext}` : 'Closed';
+    return `<div class="hours__row ${today ? 'hours__row--today' : ''} ${!h ? 'hours__row--closed' : ''}">
+      <div class="hours__day">${DAY_LABELS[d]}${today ? ' (today)' : ''}</div>
+      <div class="hours__time">${time}</div>
+    </div>`;
+  }).join('');
+
+  const hasExtended = c.extendedDays.length > 0;
+  const primary = primaryPhone(c);
+  const cleanPhone = primary ? primary.replace(/[^+\d]/g,'') : null;
+
+  document.getElementById('detailBody').innerHTML = `
+
+    ${c.banner ? `
+      <div class="notice notice--info">
+        <strong>Notice</strong>
+        <p>${c.banner.message}</p>
+      </div>` : ''}
+
+    ${stale ? `
+      <div class="notice notice--warn">
+        <strong style="color: var(--color-red-00);">Hours not recently verified</strong>
+        <p>Please call ahead to confirm.</p>
+      </div>` : ''}
+
+    <p style="font-size: 1rem; color: var(--color-mid-grey-00);">
+      <span title="Date the Ministry of Health & Wellness last confirmed this clinic's hours, services, and phone numbers.">Last verified: ${verifiedDate.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric'})}</span>
+      · Information sourced from the Ministry of Health & Wellness${c.source ? ` · <a href="${c.source}" target="_blank" rel="noopener">View on health.gov.bb →</a>` : ''}
+    </p>
+
+    <div class="detail-actions">
+      <button type="button" id="detailDirections" class="btn">Get directions</button>
+      ${cleanPhone ? `<a href="tel:${cleanPhone}" class="btn-secondary">Call ${fmtPhone(primary)}</a>` : ''}
+    </div>
+
+    <aside class="notice notice--teal">
+      <strong>Not sure if you need to come in?</strong>
+      <p><a href="#">Try the symptom checker →</a></p>
+    </aside>
+
+    <section class="detail-section">
+      <h2>Opening hours</h2>
+      <div class="hours">${hoursRows}</div>
+      ${hasExtended ? `<p style="font-size: 1rem; color: var(--color-mid-grey-00);">★ Extended hours until 8:00 PM</p>` : ''}
+    </section>
+
+    <section class="detail-section">
+      <h2>Services offered</h2>
+      <ul class="bullets">
+        ${c.services.map(svc => `<li>${svc}</li>`).join('')}
+      </ul>
+    </section>
+
+    <section class="detail-section">
+      <h2>Call ahead</h2>
+      <p style="font-size:1rem; color:var(--color-mid-grey-00); margin-bottom: 0.25rem;">${c.phones.main ? 'Main switchboard plus direct lines for each department.' : 'No main switchboard — call the department directly.'}</p>
+      <div class="phones">
+        ${c.phones.main ? `
+          <a href="tel:${c.phones.main.replace(/[^+\d]/g,'')}" class="phones__row">
+            <span><strong>Main switchboard</strong></span>
+            <span class="phones__num">${fmtPhone(c.phones.main)}</span>
+          </a>` : ''}
+        ${c.phones.exts.map(([label, num]) => `
+          <a href="tel:${num.replace(/[^+\d]/g,'')}" class="phones__row">
+            <span>${label}</span>
+            <span class="phones__num">${fmtPhone(num)}</span>
+          </a>`).join('')}
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h2>Address</h2>
+      <p style="font-size: 1.125rem;">${c.address}</p>
+      <div class="detail-actions">
+        <button type="button" id="copyAddr" class="btn-tertiary">Copy address</button>
+        <button type="button" id="openMaps"  class="btn-tertiary">Open in Maps</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('detailDirections').onclick = () => window.open(directionsURL(c), '_blank', 'noopener');
+  document.getElementById('copyAddr').onclick = () => { navigator.clipboard?.writeText(c.address); };
+  document.getElementById('openMaps').onclick = () => window.open(placeURL(c), '_blank', 'noopener');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('[data-screen]').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-screen="${name}"]`).classList.add('active');
+  if (name !== 'detail') state.currentDetailSlug = null;
+  window.scrollTo(0, 0);
+}
+function showDetail(slug) { state.currentDetailSlug = slug; renderDetail(slug); showScreen('detail'); }
+
+document.querySelectorAll('.back-to-list').forEach(el => el.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  showScreen('landing');
+}));
+document.getElementById('changeLocation').onclick = () => showScreen('location');
+document.getElementById('showAllBtn').onclick = () => showScreen('landing');
+
+function applyParish(value) {
+  if (!value) return;
+  document.getElementById('locationLabel').innerHTML =
+    `<strong>Near you:</strong> ${value} ·
+     <button id="changeLocation" type="button" class="text-link">Change parish</button>`;
+  document.getElementById('changeLocation').onclick = () => showScreen('location');
+  showScreen('landing');
+}
+document.getElementById('confirmParish').onclick = () => {
+  applyParish(document.getElementById('parishPicker').value);
+};
+// Progressive enhancement: pressing Enter in the select submits too.
+document.getElementById('parishPicker').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    applyParish(e.target.value);
+  }
+});
+
+const tList = document.getElementById('toggleList');
+const tMap  = document.getElementById('toggleMap');
+function setView(v) {
+  state.view = v;
+  if (v === 'list') {
+    document.getElementById('listView').style.display = '';
+    document.getElementById('mapView').style.display = 'none';
+    tList.setAttribute('aria-pressed','true');
+    tMap.setAttribute('aria-pressed','false');
+  } else {
+    document.getElementById('listView').style.display = 'none';
+    document.getElementById('mapView').style.display = '';
+    tList.setAttribute('aria-pressed','false');
+    tMap.setAttribute('aria-pressed','true');
+    renderMap();
+  }
+}
+tList.onclick = () => setView('list');
+tMap.onclick  = () => setView('map');
+
+document.getElementById('fitAllBtn').onclick = () => fitAllPolyclinics();
+document.getElementById('locateMeBtn').onclick = () => locateUser();
+
+// Sync the pill bar and modal UI to reflect the current filter state.
+function syncFilterUI() {
+  document.querySelectorAll('.chip[data-pill]').forEach(btn => {
+    const isOpenNow = btn.dataset.pill === 'openNow';
+    const active = isOpenNow ? state.filters.openNow : state.filters.services.has(btn.dataset.svc);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+  const openCb = document.getElementById('availOpenNow');
+  if (openCb) openCb.checked = state.filters.openNow;
+  drawer.querySelectorAll('input[data-svc]').forEach(cb => {
+    cb.checked = state.filters.services.has(cb.dataset.svc);
+  });
+  // "More filters (N)" — count only filters not represented by a pill.
+  const hiddenCount = [...state.filters.services].filter(s => !PILL_SERVICES.has(s)).length;
+  const moreBtn = document.getElementById('moreFilters');
+  if (moreBtn) moreBtn.textContent = hiddenCount > 0 ? `More filters (${hiddenCount})` : 'More filters…';
+}
+
+document.querySelectorAll('.chip[data-pill]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.pill === 'openNow') {
+      state.filters.openNow = !state.filters.openNow;
+    } else {
+      const svc = btn.dataset.svc;
+      if (state.filters.services.has(svc)) state.filters.services.delete(svc);
+      else state.filters.services.add(svc);
+    }
+    syncFilterUI();
+    rerender();
+  });
+});
+
+const drawer = document.getElementById('filterDrawer');
+document.getElementById('moreFilters').onclick = () => { drawer.setAttribute('aria-hidden','false'); updateApplyCount(); };
+document.getElementById('closeFilters').onclick = () => drawer.setAttribute('aria-hidden','true');
+document.getElementById('filterScrim').onclick = () => drawer.setAttribute('aria-hidden','true');
+
+document.getElementById('availOpenNow').onchange = (e) => {
+  state.filters.openNow = e.target.checked;
+  syncFilterUI();
+  updateApplyCount();
+  rerender();
+};
+drawer.querySelectorAll('input[data-svc]').forEach(cb => cb.onchange = () => {
+  if (cb.checked) state.filters.services.add(cb.dataset.svc);
+  else state.filters.services.delete(cb.dataset.svc);
+  syncFilterUI();
+  updateApplyCount();
+  rerender();
+});
+
+function updateApplyCount() { document.getElementById('applyCount').textContent = getVisibleClinics().length; }
+document.getElementById('applyFilters').onclick = () => { drawer.setAttribute('aria-hidden','true'); rerender(); };
+document.getElementById('clearFilters').onclick = () => {
+  state.filters = { openNow:false, services:new Set() };
+  syncFilterUI();
+  updateApplyCount();
+  rerender();
+};
+function clearAllFilters() {
+  state.filters = { openNow:false, services:new Set() };
+  syncFilterUI();
+  rerender();
+}
+
+const dayPicker = document.getElementById('dayPicker');
+const timeLabel = document.getElementById('currentTimeLabel');
+function setSimulatedTime(value) {
+  if (value === 'auto') { state.simulatedTime = null; }
+  else {
+    const [day, hour] = value.split('-');
+    const dayIdx = DAY_NAMES.indexOf(day);
+    const today = new Date();
+    const diff = dayIdx - today.getDay();
+    const sim = new Date(today);
+    sim.setDate(today.getDate() + diff);
+    sim.setHours(parseInt(hour), 0, 0, 0);
+    state.simulatedTime = sim;
+  }
+  updateTimeLabel();
+  rerender();
+}
+function updateTimeLabel() {
+  const d = now();
+  timeLabel.textContent = `(${DAY_LABELS[dayKey(d)]} ${fmtTime(decimalHours(d))})`;
+}
+dayPicker.onchange = (e) => setSimulatedTime(e.target.value);
+
+function rerender() {
+  renderList();
+  if (state.view === 'map') renderMap();
+  if (state.currentDetailSlug) renderDetail(state.currentDetailSlug);
+  updateTimeLabel();
+}
+
+updateTimeLabel();
+renderList();
+</script>
+
+</body>
+</html>
