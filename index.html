@@ -338,6 +338,12 @@
           </div>
         </div>
 
+        <!-- Symptom checker offramp — visible before users commit to picking a clinic -->
+        <aside class="findpc-notice findpc-notice--teal" style="margin-bottom: 1.5rem;">
+          <strong>Not sure if you need to come in?</strong>
+          <p><a class="govbb-link govbb-link--secondary" href="#">Try the symptom checker →</a></p>
+        </aside>
+
         <!-- List view -->
         <div id="listView"></div>
 
@@ -944,10 +950,6 @@ function renderDetail(slug) {
       ${cleanPhone ? `<a href="tel:${cleanPhone}" class="govbb-btn--secondary">Call ${fmtPhone(primary)}</a>` : ''}
     </div>
 
-    <aside class="findpc-notice findpc-notice--teal">
-      <strong>Not sure if you need to come in?</strong>
-      <p><a class="govbb-link govbb-link--secondary" href="#">Try the symptom checker →</a></p>
-    </aside>
 
     <section class="findpc-detail__section">
       <h2 class="govbb-text-h2">Opening hours</h2>
