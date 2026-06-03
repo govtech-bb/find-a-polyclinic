@@ -32,6 +32,30 @@
       max-width: 50rem;
     }
 
+    /* Pharmacy on site card — borrows the open-pharmacy icon-row pattern */
+    .pharm-card {
+      background: var(--color-blue-10);
+      border-left: 4px solid var(--color-blue-100);
+      padding: var(--spacing-s) var(--spacing-xm);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+    .pharm-card__row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      font-size: var(--font-size-body);
+      line-height: 1.5;
+    }
+    .pharm-card__icon {
+      flex-shrink: 0;
+      width: 1.25rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+
     /* Location row + filter chips + view toggle */
     .findpc-controls {
       display: flex;
@@ -344,6 +368,14 @@
           <p><a class="govbb-link govbb-link--secondary" href="#">Try the symptom checker →</a></p>
         </aside>
 
+        <!-- Cross-link to the Open Pharmacy service for private pharmacies -->
+        <aside class="findpc-notice" style="background: var(--color-yellow-40); border-left: 4px solid var(--color-yellow-100); margin-bottom: 1.5rem; padding: var(--spacing-s) var(--spacing-xm); border-radius: 4px;">
+          <strong>Need a pharmacy instead?</strong>
+          <p style="margin-top: 0.25rem;">Polyclinic pharmacies dispense free for SBS prescriptions. For private pharmacies and after-hours options, use
+            <a class="govbb-link" href="https://amogendukwe-sd.github.io/open-pharmacy/" target="_blank" rel="noopener">Open Pharmacy →</a>.
+          </p>
+        </aside>
+
         <!-- List view -->
         <div id="listView"></div>
 
@@ -525,7 +557,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Pharmacy','Environmental Health'],
     is247:false, lastVerified:'2026-05-12', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=7' },
+    source:'https://www.health.gov.bb/Institution?institution=7',
+    pharmacy:{ phone:'(246) 536-4346', hoursText:'Mon–Fri 8:15 AM – 8:30 PM', notes:'Open until 8:30 PM — the late option for the south.', routes:'Routes 30, 31 from Bridgetown (Fairchild St Terminal)' } },
 
   { slug:'edgar-cochrane',   name:'Edgar Cochrane Polyclinic',   parish:'St. Michael', address:'Wildey, St. Michael',
     distance:4.1, lat:13.0926825, lng:-59.5862874,
@@ -540,7 +573,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care'],
     is247:false, lastVerified:'2026-05-12', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=3' },
+    source:'https://www.health.gov.bb/Institution?institution=3',
+    pharmacy:{ phone:'(246) 536-4128', hoursText:'Mon–Fri 8:15 AM – 4:30 PM', notes:'', routes:'Routes 11, 22 from Bridgetown' } },
 
   { slug:'winston-scott',    name:'Sir Winston Scott Polyclinic', parish:'St. Michael', address:'Ladymeade Gardens, Bridgetown, St. Michael',
     distance:5.2, lat:13.0919744, lng:-59.6072704,
@@ -558,7 +592,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Fast Track','Immunisation','Pregnancy Care','24/7'],
     is247:true, lastVerified:'2026-05-15', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=9' },
+    source:'https://www.health.gov.bb/Institution?institution=9',
+    pharmacy:{ phone:'(246) 536-3419', hoursText:'Mon–Fri 8:15 AM – 10:00 PM · Sat 8:15 AM – 4:30 PM', notes:'Latest-closing government pharmacy. The only one open on Saturdays.', routes:'Routes 11, 12 from Bridgetown Terminal (Probyn St)' } },
 
   { slug:'branford-taitt',   name:'Branford Taitt Polyclinic',   parish:'St. Michael', address:'Black Rock Main Road, St. Michael',
     distance:7.8, lat:13.1180833, lng:-59.6181658,
@@ -571,7 +606,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Environmental Health'],
     is247:false, lastVerified:'2026-05-15', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=1' },
+    source:'https://www.health.gov.bb/Institution?institution=1',
+    pharmacy:{ phone:'(246) 536-3700', hoursText:'Mon–Fri 8:15 AM – 6:30 PM', notes:'Open until 6:30 PM.', routes:'Routes 11, 11A from Bridgetown Terminal' } },
 
   { slug:'eunice-gibson',    name:'Eunice Gibson Polyclinic',    parish:'St. Michael', address:'Warrens, St. Michael',
     distance:9.2, lat:13.1410169, lng:-59.6060684,
@@ -586,7 +622,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Environmental Health'],
     is247:false, lastVerified:'2026-04-08', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=4' },
+    source:'https://www.health.gov.bb/Institution?institution=4',
+    pharmacy:{ phone:'(246) 536-4000', hoursText:'Mon–Fri 8:15 AM – 4:30 PM', notes:'', routes:'Routes 11, 11C from Bridgetown' } },
 
   { slug:'frederick-miller', name:'Frederick "Freddie" Miller Polyclinic', parish:'St. George', address:'The Glebe, St. George',
     distance:10.5, lat:13.1350746, lng:-59.5634572,
@@ -601,7 +638,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Pharmacy'],
     is247:false, lastVerified:'2026-05-18', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=5' },
+    source:'https://www.health.gov.bb/Institution?institution=5',
+    pharmacy:{ phone:'(246) 429-1680 ext. 237', hoursText:'Mon–Fri 8:15 AM – 4:30 PM', notes:'', routes:'Route 3 from Bridgetown (Fairchild St Terminal)' } },
 
   { slug:'st-philip',        name:'St. Philip Polyclinic',       parish:'St. Philip', address:'Six Roads Cross Roads, St. Philip',
     distance:11.6, lat:13.1180875, lng:-59.4762681,
@@ -617,7 +655,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Pharmacy','Environmental Health'],
     is247:false, lastVerified:'2026-04-29', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=8' },
+    source:'https://www.health.gov.bb/Institution?institution=8',
+    pharmacy:{ phone:'(246) 536-4215', hoursText:'Mon–Fri 8:15 AM – 4:30 PM', notes:'', routes:'Route 10 from Bridgetown (Fairchild St Terminal)' } },
 
   { slug:'david-thompson',   name:'David Thompson Health & Social Services Complex', parish:'St. John', address:'Colleton Road, Glebe Land, St. John',
     distance:17.5, lat:13.1818838, lng:-59.4961274,
@@ -632,7 +671,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Social Services','Environmental Health'],
     is247:false, lastVerified:'2026-05-12', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=2' },
+    source:'https://www.health.gov.bb/Institution?institution=2',
+    pharmacy:{ phone:'(246) 536-4400', hoursText:'Mon–Fri 8:15 AM – 4:30 PM', notes:'Serves eastern parishes.', routes:'Routes 3B or 5 from Bridgetown' } },
 
   { slug:'maurice-byer',     name:'Maurice Byer Polyclinic',     parish:'St. Peter', address:'Station Hill, St. Peter',
     distance:30.0, lat:13.2535440, lng:-59.6385191,
@@ -651,7 +691,8 @@ const CLINICS = [
     extendedDays:[],
     services:['General Practice','Immunisation','Pregnancy Care','Dental','Environmental Health','Pharmacy'],
     is247:false, lastVerified:'2026-05-08', banner:null,
-    source:'https://www.health.gov.bb/Institution?institution=6' },
+    source:'https://www.health.gov.bb/Institution?institution=6',
+    pharmacy:{ phone:'(246) 536-3200', hoursText:'Mon–Fri 8:15 AM – 8:30 PM', notes:'Open until 8:30 PM — the late option for the north and west.', routes:'Route 1B from Bridgetown (Lower Green Terminal)' } },
 ];
 
 const QEH = { name:'Queen Elizabeth Hospital — A&E', address:'Martindales Road, Bridgetown', phone:'+1-246-436-6450', distance:4.2 };
@@ -977,6 +1018,22 @@ function renderDetail(slug) {
           </a>`).join('')}
       </div>
     </section>
+
+    ${c.pharmacy ? `
+    <section class="findpc-detail__section pharm-section">
+      <h2 class="govbb-text-h2">Pharmacy on site</h2>
+      <p class="govbb-text-caption" style="color: var(--color-mid-grey-00); margin-bottom: var(--spacing-xs);">Free dispensing for SBS prescriptions. Bring your prescription and ID.</p>
+      <div class="pharm-card">
+        <div class="pharm-card__row"><span class="pharm-card__icon" aria-hidden="true">🕒</span><span><strong>${c.pharmacy.hoursText}</strong></span></div>
+        <div class="pharm-card__row"><span class="pharm-card__icon" aria-hidden="true">📞</span><a href="tel:${c.pharmacy.phone.replace(/[^+\d]/g,'')}" class="govbb-link">${c.pharmacy.phone}</a></div>
+        ${c.pharmacy.notes ? `<div class="pharm-card__row"><span class="pharm-card__icon" aria-hidden="true">ℹ️</span><span>${c.pharmacy.notes}</span></div>` : ''}
+        ${c.pharmacy.routes ? `<div class="pharm-card__row"><span class="pharm-card__icon" aria-hidden="true">🚌</span><span>${c.pharmacy.routes}</span></div>` : ''}
+      </div>
+      <p class="govbb-text-caption" style="margin-top: var(--spacing-xs);">
+        Looking for a private pharmacy instead?
+        <a href="https://amogendukwe-sd.github.io/open-pharmacy/" class="govbb-link" target="_blank" rel="noopener">Open Pharmacy →</a>
+      </p>
+    </section>` : ''}
 
     <section class="findpc-detail__section">
       <h2 class="govbb-text-h2">Address</h2>
